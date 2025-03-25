@@ -10,13 +10,15 @@ class socket {
 
 };
 
-//jt905 TCP中继服务初始化
-int jt905_tcp_relay_init();
-
-//jt905 TCP客户端初始化
-int jt905_tcp_relay_init();
 
 void socket_pthread(void *);
+
+//jt905 TCP中继服务
+int jt905_tcp_relay_server_pthread();
+
+//jt905 TCP客户端线程
+int jt905_tcp_client_pthread();
+
 
 void nn_socket_init();
 

@@ -13,4 +13,6 @@ class client {
 
 void nn_client_init();
 
+void jt1078_pthread(void *);
+
 #endif //NDK_COMPILE_CLIENT_H

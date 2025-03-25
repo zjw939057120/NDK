@@ -32,3 +32,7 @@ void nn_client_init() {
         perror("nn_connect");
     }
 }
+
+void jt1078_pthread(void *) {
+
+}

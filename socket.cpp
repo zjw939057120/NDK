@@ -34,22 +34,21 @@ int nn_sock_server;
 int nn_sock_client;
 
 void socket_pthread(void *) {
-    jt905_tcp_client_init();
-    jt905_tcp_relay_init();
-
     nn_socket_init();
     nn_client_init();
 
-    pthread_t thread_id_1;
-    pthread_t thread_id_2;
-    pthread_create(&thread_id_1, NULL, reinterpret_cast<void *(*)(void *)>(read_msg), NULL);//接收主TCP网络数据线程
-    pthread_create(&thread_id_2, NULL, reinterpret_cast<void *(*)(void *)>(server_data_worke_thread),
-                   NULL);//主TCP网络数据解析线程
+    pthread_t thread1;
+    pthread_create(&thread1, NULL, reinterpret_cast<void *(*)(void *)>(jt905_tcp_client_pthread), NULL);
+    pthread_t thread2;
+    pthread_create(&thread2, NULL, reinterpret_cast<void *(*)(void *)>(jt905_tcp_relay_server_pthread), NULL);
+    pthread_t thread3;
+    pthread_create(&thread3, NULL, reinterpret_cast<void *(*)(void *)>(read_msg), NULL);//接收主TCP网络数据线程
+    pthread_t thread4;
+    pthread_create(&thread4, NULL, reinterpret_cast<void *(*)(void *)>(server_data_worke_thread), NULL);//主TCP网络数据解析线程
 }
 
-
-int jt905_tcp_relay_init() {
-    int port = 5693;
+int jt905_tcp_relay_server_pthread() {
+    int port = 1883;
 
     hlog_set_level(LOG_LEVEL_DEBUG);
 
@@ -106,17 +105,18 @@ srv.withTLS(&ssl_opt);
 }
 
 
-int jt905_tcp_client_init() {
+TcpClient cli;
+
+int jt905_tcp_client_pthread() {
     int remote_port = 7090;
     const char *remote_host = "1.70.236.173";
 
-    TcpClient cli;
     int connfd = cli.createsocket(remote_port, remote_host);
     if (connfd < 0) {
         return -20;
     }
     printf("client connect to port %d, connfd=%d ...\n", remote_port, connfd);
-    cli.onConnection = [&cli](const SocketChannelPtr &channel) {
+    cli.onConnection = [](const SocketChannelPtr &channel) {
         std::string peeraddr = channel->peeraddr();
         if (channel->isConnected()) {
             printf("connected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
@@ -160,7 +160,7 @@ int jt905_tcp_client_init() {
 
     cli.start();
 
-    std::string str;
+/*    std::string str;
     while (std::getline(std::cin, str)) {
         if (str == "close") {
             cli.closesocket();
@@ -173,7 +173,7 @@ int jt905_tcp_client_init() {
             if (!cli.isConnected()) break;
             cli.send(str);
         }
-    }
+    }*/
 
     return 0;
 }
@@ -207,66 +207,18 @@ void nn_socket_init() {
  * @改动说明：
  *************************************************************/
 void read_msg(void *arg) {
-/*    int num, i;                            // Counter of received bytes
-    unsigned char revbuf[BUFFER_SIZE]; // Receive buffer
-
-    *//* Try to connect the server *//*
-    while (1)// Check remoter command
-    {
-        if (access("/tmp/xstrive_upgrade.upf", F_OK) == 0 || (access("/tmp/_4gmodule_found", F_OK) != 0)) {
-            sleep(10);
-        }
-
-        if (net_flag == 1)//(0:断开；1:正常)
-        {
-            //memset (revbuf,0,256);
-            num = recv(sockfd, revbuf, BUFFER_SIZE, 0);
-
-            switch (num) {
-                case -1://当ret < 0 说明出现了异常 例如阻塞状态解除，或者读取数据时出现指针错误等。所以我们这里要主动断开和客户端的链接。
-
-                    printf("ERROR: <TCP>Receive string error! Take the initiative to disconnect \n");
-
-                    close(sockfd);
-                    net_flag = 0;//(0:断开；1:正常)
-                    break;
-                case 0://num == 0 说明服务器掉线。
-
-                    printf("ERROR: <TCP>Receive string error! Server disconnected \n");
-
-                    close(sockfd);
-                    net_flag = 0;//(0:断开；1:正常)
-                    break;
-                default:
-                    printf("Server data length = %d\n\n", num);
-                    break;
-            }
-
-            //printf ("OK: Receviced string is: %X\n", revbuf);
-
-            //获取系统时间
-            struct tm *t;
-            time_t tt;
-            time(&tt);
-            t = localtime(&tt);
-            printf("Receviced Data Timer:%4d-%02d-%02d %02d:%02d:%02d    length:%d\n\n", t->tm_year + 1900,
-                   t->tm_mon + 1, t->tm_mday, t->tm_hour, t->tm_min, t->tm_sec, num);
-            printf("Server Data:\n");
-            if (num > 0) {
-                nn_send(nn_sock_client, &revbuf, num, 0);
-                revbuf[num] = '\0';
-                for (i = 0; i < num; i++) {
-                    //write_loop_buf_cocket(revbuf[i]&0xff);
-                    printf("%02X ", revbuf[i]);
-                }
-                printf("\n");
-            } else {
-                usleep(1000 * 100);
-            }
+    std::string str = "ABCDEFG";
+    while (1) {
+        if (cli.isConnected()) {
+            printf("client send %s\n", str.c_str());
+            cli.send(str);
+            sleep(3);
         } else {
-            usleep(1000 * 200);
+            printf("client not isConnected\n");
+            sleep(1);
+            continue;
         }
-    }*/
+    }
 }
 
 
@@ -280,70 +232,7 @@ void read_msg(void *arg) {
  * @改动说明：
  *************************************************************/
 void server_data_worke_thread(void *) {
-/*    sleep(30);
-    int rcv_len_, i;
-    //重新接收新的一帧
-    int rcv_len = 0;
-    unsigned char rcv_buf[1024] = {0};
-    unsigned char revbuf[1024] = {0};
-    unsigned char c;
-    while (1) {
-        if (access("/tmp/xstrive_upgrade.upf", F_OK) == 0 || (access("/tmp/_4gmodule_found", F_OK) != 0)) {
-            sleep(10);
-        }
 
-        size_t rcv_buf_len = sizeof(rcv_buf);
-        nn_recv(nn_sock_server, &rcv_buf, rcv_buf_len, 0);
-        for (size_t i = 0; i < rcv_buf_len; i++) {
-            rcv_buf[i] &= 0XFF;
-            rcv_len++;
-            if (i > 0 && rcv_buf[i] == 0x7E) {
-                break;
-            }
-        }
-
-        net_rcv_ack = 0;//清零
-        rcv_len_ = un_transition(revbuf, rcv_buf, rcv_len);//反转译
-        printf("--------------------------------------------------------------------------------------------------------------------------------\n");
-        printf("receive:%d\n\n", rcv_len_);
-        for (i = 0; i < rcv_len; i++) {
-            printf("%.2X ", rcv_buf[i]);
-        }
-        printf("\n\n");
-        for (i = 0; i < rcv_len_; i++) {
-            printf("%.2X ", revbuf[i]);
-        }
-        printf("\n");
-        printf("--------------------------------------------------------------------------------------------------------------------------------\n");
-
-
-
-        //校验
-        unsigned char check_num = 0;
-        for (i = 1; i < (rcv_len_ - 2); i++) {
-            check_num ^= revbuf[i];
-        }
-        unsigned char check_num_tmp = revbuf[rcv_len_ - 2];
-        printf("check_num = %d   check_num_tmp = %d\n", check_num, check_num_tmp);
-        if (check_num_tmp == check_num) {//校验不对
-            ServerData_Work(revbuf, rcv_len_);
-            net_rcv_ack = 0;//清零
-            rcv_len = 0;//重新接收新的一帧
-        }
-
-
-        if (MyApplication.NetFlag == 1)//网络数据透传标志
-        {
-            unsigned char serialBuf[rcv_len_ * 2 + 2];
-            memcpy(serialBuf + 1, revbuf, rcv_len_);//复制数据
-            ByteToString(serialBuf, rcv_len_ * 2 + 2);
-            serialBuf[0] = 0xa1;
-            serialBuf[1] = 0xfa;
-            SendClientData(0x01, serialBuf, 0x00C0, rcv_len_ * 2 + 2);//透传数据到手机APP(透传数据部分为GBK编码字符串)
-        }
-
-        MyApplication.NoACK_sum = 0;//超过10分钟没有服务器数据重启设备
-    }*/
 }
 
 
