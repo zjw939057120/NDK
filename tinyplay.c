@@ -72,6 +72,8 @@ void stream_close(int sig)
     close = 1;
 }
 
+// ...existing code...
+
 int main(int argc, char **argv)
 {
     FILE *file;
@@ -82,50 +84,81 @@ int main(int argc, char **argv)
     unsigned int card = 0;
     unsigned int period_size = 1024;
     unsigned int period_count = 4;
+    unsigned int channels = 2; // 默认通道数
+    unsigned int rate = 44100; // 默认采样率
+    unsigned int bits = 16;    // 默认位深度
+    uint32_t data_sz = 0;
     char *filename;
     int more_chunks = 1;
+    int is_raw = 0; // 标记是否为原始 PCM 文件
 
     if (argc < 2) {
-        fprintf(stderr, "Usage: %s file.wav [-D card] [-d device] [-p period_size]"
-                " [-n n_periods] \n", argv[0]);
+        fprintf(stderr, "Usage: %s file.wav [--raw channels rate bits data_size] [-D card] [-d device] [-p period_size]"
+                        " [-n n_periods] \n", argv[0]);
         return 1;
     }
 
     filename = argv[1];
+    if (strcmp(filename, "--raw") == 0) {
+        fprintf(stderr, "Error: Missing file name for raw PCM input\n");
+        return 1;
+    }
+
+    // 检查是否为原始 PCM 文件
+    if (argc > 2 && strcmp(argv[2], "--raw") == 0) {
+        is_raw = 1;
+        if (argc < 7) {
+            fprintf(stderr, "Usage for raw PCM: %s file.pcm --raw channels rate bits data_size [-D card] [-d device] [-p period_size] [-n n_periods]\n", argv[0]);
+            return 1;
+        }
+        channels = atoi(argv[3]);
+        rate = atoi(argv[4]);
+        bits = atoi(argv[5]);
+        data_sz = atoi(argv[6]);
+        argv += 5; // 跳过原始 PCM 参数
+    }
+
     file = fopen(filename, "rb");
     if (!file) {
         fprintf(stderr, "Unable to open file '%s'\n", filename);
         return 1;
     }
 
-    fread(&riff_wave_header, sizeof(riff_wave_header), 1, file);
-    if ((riff_wave_header.riff_id != ID_RIFF) ||
-        (riff_wave_header.wave_id != ID_WAVE)) {
-        fprintf(stderr, "Error: '%s' is not a riff/wave file\n", filename);
-        fclose(file);
-        return 1;
-    }
-
-    do {
-        fread(&chunk_header, sizeof(chunk_header), 1, file);
-
-        switch (chunk_header.id) {
-        case ID_FMT:
-            fread(&chunk_fmt, sizeof(chunk_fmt), 1, file);
-            /* If the format header is larger, skip the rest */
-            if (chunk_header.sz > sizeof(chunk_fmt))
-                fseek(file, chunk_header.sz - sizeof(chunk_fmt), SEEK_CUR);
-            break;
-        case ID_DATA:
-            /* Stop looking for chunks */
-            more_chunks = 0;
-            chunk_header.sz = le32toh(chunk_header.sz);
-            break;
-        default:
-            /* Unknown chunk, skip bytes */
-            fseek(file, chunk_header.sz, SEEK_CUR);
+    if (!is_raw) {
+        fread(&riff_wave_header, sizeof(riff_wave_header), 1, file);
+        if ((riff_wave_header.riff_id != ID_RIFF) ||
+            (riff_wave_header.wave_id != ID_WAVE)) {
+            fprintf(stderr, "Error: '%s' is not a riff/wave file\n", filename);
+            fclose(file);
+            return 1;
         }
-    } while (more_chunks);
+
+        do {
+            fread(&chunk_header, sizeof(chunk_header), 1, file);
+
+            switch (chunk_header.id) {
+                case ID_FMT:
+                    fread(&chunk_fmt, sizeof(chunk_fmt), 1, file);
+                    /* If the format header is larger, skip the rest */
+                    if (chunk_header.sz > sizeof(chunk_fmt))
+                        fseek(file, chunk_header.sz - sizeof(chunk_fmt), SEEK_CUR);
+                    break;
+                case ID_DATA:
+                    /* Stop looking for chunks */
+                    more_chunks = 0;
+                    chunk_header.sz = le32toh(chunk_header.sz);
+                    break;
+                default:
+                    /* Unknown chunk, skip bytes */
+                    fseek(file, chunk_header.sz, SEEK_CUR);
+            }
+        } while (more_chunks);
+
+        channels = chunk_fmt.num_channels;
+        rate = chunk_fmt.sample_rate;
+        bits = chunk_fmt.bits_per_sample;
+        data_sz = chunk_header.sz;
+    }
 
     /* parse command line arguments */
     argv += 2;
@@ -154,8 +187,7 @@ int main(int argc, char **argv)
             argv++;
     }
 
-    play_sample(file, card, device, chunk_fmt.num_channels, chunk_fmt.sample_rate,
-                chunk_fmt.bits_per_sample, period_size, period_count, chunk_header.sz);
+    play_sample(file, card, device, channels, rate, bits, period_size, period_count, data_sz);
 
     fclose(file);
 

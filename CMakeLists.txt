@@ -45,3 +45,6 @@ target_link_libraries(tinyhostless -ldl)
 
 add_executable(tinypcminfo tinypcminfo.c ${libtinyalsa})
 target_link_libraries(tinypcminfo -ldl)
+
+add_executable(pcm_converter pcm_converter.c ${libtinyalsa})
+target_link_libraries(pcm_converter -ldl)
