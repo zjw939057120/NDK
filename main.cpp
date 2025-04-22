@@ -54,12 +54,11 @@ void signalHandler(int signal) {
 int main() {
     // 设置信号处理器
     std::signal(SIGSEGV, signalHandler);
+    int *ptr = (int *)0x12345678; // 假设一个无效的内存地址
 
-    // 故意触发段错误
-    int *ptr = nullptr;
-    *ptr = 42; // 这里会导致段错误
+    printf("Attempting to access invalid memory...\n");
 
-    std::cout << "This line will not be reached." << std::endl;
+    *ptr = 42; // 尝试写入无效地址
 
     return 0;
 }
