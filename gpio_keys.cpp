@@ -73,8 +73,7 @@ int main() {
         read_gpio_value(KEY1);
         read_gpio_value(KEY2);
         read_gpio_value(KEY3);
-        //usleep(200000);
-        sleep(3);
+        usleep(200000);
     }
 
     return 0;

@@ -20,6 +20,7 @@ set(CMAKE_CXX_STANDARD 14)
 
 add_executable(test main.cpp)
 add_executable(gpio_keys gpio_keys.cpp)
+add_executable(stack_limit stack_limit.cpp)
 
 # gdb调试命令
 # /data/local/android_r22_install_gdb/bin/gdb  /data/local/test
