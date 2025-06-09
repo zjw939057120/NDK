@@ -10,21 +10,22 @@
 #include <iostream>
 
 #include "hv/TcpServer.h"
+#include "Serial.h"
 
 using namespace hv;
 
 #define TEST_TLS        0
+#define CAN_BUFFER_LEN 13
+
+TcpServer srv;
+Serial serial;
 
 int main(int argc, char *argv[]) {
-    if (argc < 2) {
-        printf("Usage: %s port\n", argv[0]);
-        return -10;
-    }
-    int port = atoi(argv[1]);
+    serial.Open();
+    int port = 1883;
 
     hlog_set_level(LOG_LEVEL_DEBUG);
 
-    TcpServer srv;
     int listenfd = srv.createsocket(port);
     if (listenfd < 0) {
         return -20;
@@ -41,9 +42,7 @@ int main(int argc, char *argv[]) {
         }
     };
     srv.onMessage = [](const SocketChannelPtr &channel, Buffer *buf) {
-        // echo
-        printf("< %.*s\n", (int) buf->size(), (char *) buf->data());
-        channel->write(buf);
+        serial.Send(buf->data(), CAN_BUFFER_LEN);//转发tcp客户端数据到串口
     };
     srv.setThreadNum(4);
     srv.setLoadBalance(LB_LeastConnections);
@@ -59,17 +58,14 @@ int main(int argc, char *argv[]) {
 
     srv.start();
 
-    std::string str;
-    while (std::getline(std::cin, str)) {
-        if (str == "close") {
-            srv.closesocket();
-        } else if (str == "start") {
-            srv.start();
-        } else if (str == "stop") {
-            srv.stop();
-            break;
-        } else {
-            srv.broadcast(str.data(), str.size());
+    uint8_t buffer[CAN_BUFFER_LEN];// 读取串口数据
+    while (true) {
+        if (serial.Receive(buffer, CAN_BUFFER_LEN) > 0) {
+            for (int i = 0; i < CAN_BUFFER_LEN; ++i) {
+                printf("%02x ", buffer[i]);
+            }
+            printf("\n");
+            srv.broadcast((const void *) buffer, CAN_BUFFER_LEN);//转发串口数据到tcp客户端
         }
     }
 
