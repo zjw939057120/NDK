@@ -12,6 +12,7 @@
 #include "hv/TcpServer.h"
 #include "Serial.h"
 #include "Verification.h"
+#include "ToolKits.h"
 
 using namespace hv;
 
@@ -21,6 +22,7 @@ TcpServer srv;
 Serial serial;
 
 int main(int argc, char *argv[]) {
+    ToolKits::EnvInit();
     serial.Open();
     int port = 1883;
 
