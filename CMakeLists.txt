@@ -20,8 +20,8 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(arm64-android/include)
 link_directories(arm64-android/lib)
 
-add_executable(${PROJECT_NAME} main.cpp Serial.cpp)
-target_link_libraries(${PROJECT_NAME} -lhv_static  -llog)
+add_executable(${PROJECT_NAME} main.cpp Serial.cpp Verification.cpp)
+target_link_libraries(${PROJECT_NAME} -lhv_static -llog -static-libstdc++)
 
 add_executable(TcpClient_test TcpClient_test.cpp)
-target_link_libraries(TcpClient_test -lhv_static  -llog)
+target_link_libraries(TcpClient_test -lhv_static -llog -static-libstdc++)

@@ -12,8 +12,8 @@
 #include "hv/TcpClient.h"
 #include "hv/htime.h"
 
-#define TEST_RECONNECT  1
-#define TEST_TLS        0
+#define TEST_RECONNECT 1
+#define TEST_TLS 0
 
 using namespace hv;
 
@@ -31,26 +31,26 @@ int main(int argc, char *argv[]) {
     }
     printf("client connect to port %d, connfd=%d ...\n", remote_port, connfd);
     cli.onConnection = [&cli](const SocketChannelPtr &channel) {
-/*        std::string peeraddr = channel->peeraddr();
-        if (channel->isConnected()) {
-            printf("connected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
-            // send(time) every 3s
-            setInterval(3000, [channel](TimerID timerID) {
+        /*        std::string peeraddr = channel->peeraddr();
                 if (channel->isConnected()) {
-                    if (channel->isWriteComplete()) {
-                        char str[DATETIME_FMT_BUFLEN] = {0};
-                        datetime_t dt = datetime_now();
-                        datetime_fmt(&dt, str);
-                        channel->write(str);
-                    }
+                    printf("connected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
+                    // send(time) every 3s
+                    setInterval(3000, [channel](TimerID timerID) {
+                        if (channel->isConnected()) {
+                            if (channel->isWriteComplete()) {
+                                char str[DATETIME_FMT_BUFLEN] = {0};
+                                datetime_t dt = datetime_now();
+                                datetime_fmt(&dt, str);
+                                channel->write(str);
+                            }
+                        } else {
+                            killTimer(timerID);
+                        }
+                    });
                 } else {
-                    killTimer(timerID);
+                    printf("disconnected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
                 }
-            });
-        } else {
-            printf("disconnected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
-        }
-        */
+                */
         if (cli.isReconnect()) {
             printf("reconnect cnt=%d, delay=%d\n", cli.reconn_setting->cur_retry_cnt, cli.reconn_setting->cur_delay);
         }
@@ -90,7 +90,8 @@ int main(int argc, char *argv[]) {
             cli.stop();
             break;
         } else {
-            if (!cli.isConnected()) break;
+            if (!cli.isConnected())
+                break;
             cli.send(str);
         }
     }
