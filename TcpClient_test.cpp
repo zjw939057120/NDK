@@ -20,9 +20,6 @@ using namespace hv;
 int main(int argc, char *argv[]) {
     int remote_port = 1883;
     const char *remote_host = "127.0.0.1";
-    if (argc > 2) {
-        remote_host = argv[2];
-    }
 
     TcpClient cli;
     int connfd = cli.createsocket(remote_port, remote_host);

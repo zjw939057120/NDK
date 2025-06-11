@@ -18,22 +18,24 @@ int Serial::Open() {
         return 1;
     }
 
+/*
     const char msg[13] = {0x08, 0x00, 0x00, 0x00, 0xff, 0x01, 0x02, 0x03, 0x040, 0x05, 0x06, 0x07, 0x08};
     write(fd, msg, sizeof(msg)); // 写入数据
-    //
-    //    uint8_t buffer[13];
-    //    while (1) {
-    //        int n = read(fd, buffer, sizeof(buffer)); // 读取数据
-    //        if (n > 0) {
-    //            printf("%d\n", n);
-    //            for (int i = 0; i < 13; ++i) {
-    //                printf("%02x ", buffer[i]);
-    //            }
-    //            printf("\n");
-    //        } else {
-    //            printf("No data received or error.\n");
-    //        }
-    //    }
+
+    uint8_t buffer[13];
+    while (1) {
+        int n = read(fd, buffer, sizeof(buffer)); // 读取数据
+        if (n > 0) {
+            printf("%d\n", n);
+            for (int i = 0; i < 13; ++i) {
+                printf("%02x ", buffer[i]);
+            }
+            printf("\n");
+        } else {
+            printf("No data received or error.\n");
+        }
+    }
+*/
 
     return 0;
 }

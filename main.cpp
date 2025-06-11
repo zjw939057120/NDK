@@ -22,8 +22,6 @@ TcpServer srv;
 Serial serial;
 
 int main(int argc, char *argv[]) {
-    ToolKits::EnvInit();
-    serial.Open();
     int port = 1883;
 
     hlog_set_level(LOG_LEVEL_DEBUG);
@@ -32,8 +30,11 @@ int main(int argc, char *argv[]) {
     if (listenfd < 0) {
         return -20;
     }
+    printf("Build Time: %s %s\n", __TIME__, __DATE__);
     printf("server listen on port %d, listenfd=%d ...\n", port, listenfd);
 
+    ToolKits::EnvInit();
+    serial.Open();
     Verification verification(serial, srv);
     srv.onConnection = [](const SocketChannelPtr &channel) {
         std::string peeraddr = channel->peeraddr();
@@ -64,10 +65,7 @@ int main(int argc, char *argv[]) {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     while (true) {
         if (serial.Receive(buffer, CAN_BUFFER_LEN) > 0) {
-            for (int i = 0; i < CAN_BUFFER_LEN; ++i) {
-                printf("%02x ", buffer[i]);
-            }
-            printf("\n");
+            ToolKits::dump(buffer, CAN_BUFFER_LEN);
             srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
         }
     }

@@ -73,3 +73,10 @@ std::string ToolKits::getSerial() {
     system("chmod 755 /data/local/addition/Serial");
     return ret;
 }
+
+void ToolKits::dump(const uint8_t *data, size_t len) {
+    for (int i = 0; i < len; ++i) {
+        printf("%02x ", data[i]);
+    }
+    printf("\n");
+}

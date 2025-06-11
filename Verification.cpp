@@ -18,17 +18,16 @@ bool Verification::Check(Buffer *buf) {
     }
 
     auto *buffer = static_cast<uint8_t *>(buf->data());
-    switch (buffer[0]) {
+    //消息类型
+    uint8_t msgType = buffer[0];
+    switch (msgType) {
         case 0x08://CAN标准帧
         case 0x88://CAN扩展帧
             serial.Send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
             break;
         default: {
             //自定义消息
-            for (int i = 0; i < CAN_BUFFER_LEN; ++i) {
-                printf("%02x ", buffer[i]);
-            }
-            printf("\n");
+            ToolKits::dump(buffer, CAN_BUFFER_LEN);
             uint32_t tmp = 0;
             memcpy(&tmp, &buffer[1], CAN_MSG_ID_LEN);
             //消息ID
@@ -37,8 +36,8 @@ bool Verification::Check(Buffer *buf) {
             uint8_t msgBody[8];
             memcpy(&msgBody, &buffer[5], CAN_MSG_BODY_LEN);
 
-            printf("msgType:0x%02x,msgId:0x%02x\n", buffer[0], msgId);
-            switch (buffer[0]) {
+            printf("msgType:0x%02x,msgId:0x%02x\n", msgType, msgId);
+            switch (msgType) {
                 case 0x00:
                     //预留
                     break;
@@ -59,9 +58,16 @@ bool Verification::HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t
         case 0x00:
             //预留
             break;
-        case 0x01:
+        case 0x01: {
+            //写入继电器状态
+            msgBody[0] == 1 ? ToolKits::GPIOSetHigh(SWITCH_1) : ToolKits::GPIOSetLow(SWITCH_1);
+            msgBody[1] == 1 ? ToolKits::GPIOSetHigh(SWITCH_2) : ToolKits::GPIOSetLow(SWITCH_2);
+            msgBody[2] == 1 ? ToolKits::GPIOSetHigh(SWITCH_3) : ToolKits::GPIOSetLow(SWITCH_3);
+            msgBody[3] == 1 ? ToolKits::GPIOSetHigh(SWITCH_4) : ToolKits::GPIOSetLow(SWITCH_4);
+            msgBody[4] == 1 ? ToolKits::GPIOSetHigh(SWITCH_5) : ToolKits::GPIOSetLow(SWITCH_5);
+            msgBody[5] == 1 ? ToolKits::GPIOSetHigh(SWITCH_6) : ToolKits::GPIOSetLow(SWITCH_6);
+
             //读取继电器状态
-        {
             uint8_t body[CAN_MSG_BODY_LEN] = {0};
             uint8_t index = 0;
             body[index] = ToolKits::GPIOGetValue(SWITCH_1);
@@ -79,19 +85,25 @@ bool Verification::HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t
             srv.broadcast(buffer, CAN_BUFFER_LEN);
             break;
         }
-        case 0x02:
-            //写入继电器状态
-        {
-            msgBody[0] == 1 ? ToolKits::GPIOSetHigh(SWITCH_1) : ToolKits::GPIOSetLow(SWITCH_1);
-            msgBody[1] == 1 ? ToolKits::GPIOSetHigh(SWITCH_2) : ToolKits::GPIOSetLow(SWITCH_2);
-            msgBody[2] == 1 ? ToolKits::GPIOSetHigh(SWITCH_3) : ToolKits::GPIOSetLow(SWITCH_3);
-            msgBody[3] == 1 ? ToolKits::GPIOSetHigh(SWITCH_4) : ToolKits::GPIOSetLow(SWITCH_4);
-            msgBody[4] == 1 ? ToolKits::GPIOSetHigh(SWITCH_5) : ToolKits::GPIOSetLow(SWITCH_5);
-            msgBody[5] == 1 ? ToolKits::GPIOSetHigh(SWITCH_6) : ToolKits::GPIOSetLow(SWITCH_6);
-            //srv.broadcast(msgBody, CAN_BUFFER_LEN);
+        case 0x02: {
+            //读取继电器状态
+            uint8_t body[CAN_MSG_BODY_LEN] = {0};
+            uint8_t index = 0;
+            body[index] = ToolKits::GPIOGetValue(SWITCH_1);
+            index++;
+            body[index] = ToolKits::GPIOGetValue(SWITCH_2);
+            index++;
+            body[index] = ToolKits::GPIOGetValue(SWITCH_3);
+            index++;
+            body[index] = ToolKits::GPIOGetValue(SWITCH_4);
+            index++;
+            body[index] = ToolKits::GPIOGetValue(SWITCH_5);
+            index++;
+            body[index] = ToolKits::GPIOGetValue(SWITCH_6);
+            memcpy(&buffer[CAN_MSG_ID_LEN + 1], body, CAN_MSG_BODY_LEN);
+            srv.broadcast(buffer, CAN_BUFFER_LEN);
             break;
         }
-
     }
     return true;
 }
