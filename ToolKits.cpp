@@ -80,3 +80,7 @@ void ToolKits::dump(const uint8_t *data, size_t len) {
     }
     printf("\n");
 }
+
+bool ToolKits::is_file_exists(const std::string &filename) {
+    return access(filename.c_str(), F_OK) != -1;
+}

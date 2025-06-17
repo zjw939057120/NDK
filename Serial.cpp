@@ -8,7 +8,7 @@ int Serial::Open() {
     const char *portname = "/dev/ttyS3"; // 替换为你自己的串口设备
     fd = open(portname, O_RDWR | O_NOCTTY | O_SYNC);
     if (fd < 0) {
-        perror("open serial port");
+        perror("open m_serial port");
         return 1;
     }
 
@@ -82,6 +82,7 @@ int Serial::Receive(void *buf, size_t count) {
 }
 
 int Serial::Send(const void *buf, size_t count) {
+    std::lock_guard<std::mutex> lock(m_send_mutex);  // 自动加锁
     return write(fd, buf, count); // 写入数据
 }
 

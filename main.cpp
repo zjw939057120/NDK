@@ -58,10 +58,15 @@ int main(int argc, char *argv[]) {
     ssl_opt.crt_file = "cert/server.crt";
     ssl_opt.key_file = "cert/server.key";
     ssl_opt.verify_peer = 0;
-    srv.withTLS(&ssl_opt);
+    m_srv.withTLS(&ssl_opt);
 #endif
 
     srv.start();
+
+    if (ToolKits::is_file_exists("/data/local/demo.lock")) {
+        verification.demoThread();
+    }
+
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     while (true) {
         if (serial.Receive(buffer, CAN_BUFFER_LEN) > 0) {

@@ -2,10 +2,11 @@
 // Created by Administrator on 2025/6/10.
 //
 
+#include <iostream>
 #include "Verification.h"
 #include "ToolKits.h"
 
-Verification::Verification(Serial &serial, TcpServer &srv) : serial(serial), srv(srv) {
+Verification::Verification(Serial &serial, TcpServer &srv) : m_serial(serial), m_srv(srv) {
 
 }
 
@@ -13,7 +14,7 @@ bool Verification::Check(Buffer *buf) {
     size_t size = buf->size();
     //校验数据长度
     if (size != CAN_BUFFER_LEN) {
-        srv.broadcast(empty, CAN_BUFFER_LEN);
+        m_srv.broadcast(buf_empty, CAN_BUFFER_LEN);
         return false;
     }
 
@@ -23,7 +24,7 @@ bool Verification::Check(Buffer *buf) {
     switch (msgType) {
         case 0x08://CAN标准帧
         case 0x88://CAN扩展帧
-            serial.Send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
+            m_serial.Send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
             break;
         default: {
             //自定义消息
@@ -82,7 +83,7 @@ bool Verification::HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t
             index++;
             body[index] = ToolKits::GPIOGetValue(SWITCH_6);
             memcpy(&buffer[CAN_MSG_ID_LEN + 1], body, CAN_MSG_BODY_LEN);
-            srv.broadcast(buffer, CAN_BUFFER_LEN);
+            m_srv.broadcast(buffer, CAN_BUFFER_LEN);
             break;
         }
         case 0x02: {
@@ -101,9 +102,27 @@ bool Verification::HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t
             index++;
             body[index] = ToolKits::GPIOGetValue(SWITCH_6);
             memcpy(&buffer[CAN_MSG_ID_LEN + 1], body, CAN_MSG_BODY_LEN);
-            srv.broadcast(buffer, CAN_BUFFER_LEN);
+            m_srv.broadcast(buffer, CAN_BUFFER_LEN);
             break;
         }
     }
     return true;
+}
+
+void Verification::demoThread() {
+    std::thread t([this]() {
+        while (true) {
+            demoThreadHandle();
+        }
+    });
+    t.detach();
+}
+
+void Verification::demoThreadHandle() {
+    sleep(1);
+    m_srv.broadcast(buf_0x200, CAN_BUFFER_LEN);
+    sleep(1);
+    m_srv.broadcast(buf_0x300, CAN_BUFFER_LEN);
+    sleep(1);
+    m_srv.broadcast(buf_0x301, CAN_BUFFER_LEN);
 }

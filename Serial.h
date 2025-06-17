@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <string.h>
 #include <termios.h>
+#include <mutex>
 
 class Serial {
 
@@ -46,6 +47,8 @@ public:
 private:
     /// @brief 串口文件描述符，打开后用于读写操作
     int fd = 0;
+
+    std::mutex m_send_mutex;
 };
 
 #endif // TCPSERVER_SERIAL_H

@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <string>
+#include <unistd.h>
 
 #define SWITCH_1 32 //GPIO0_A0
 #define SWITCH_2 33 //GPIO0_A1
@@ -33,6 +34,8 @@ public:
     static std::string getSerial();
 
     static void dump(const uint8_t *data, size_t len);
+
+    static bool is_file_exists(const std::string& filename);
 };
 
 
