@@ -14,7 +14,7 @@ bool Verification::Check(Buffer *buf) {
     size_t size = buf->size();
     //校验数据长度
     if (size != CAN_BUFFER_LEN) {
-        m_srv.broadcast(buf_empty, CAN_BUFFER_LEN);
+        m_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
         return false;
     }
 
@@ -110,19 +110,37 @@ bool Verification::HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t
 }
 
 void Verification::demoThread() {
-    std::thread t([this]() {
+    //推进器demo线程
+    std::thread t1([this]() {
         while (true) {
-            demoThreadHandle();
+            demoThreadHandle1();
         }
     });
-    t.detach();
+    t1.detach();
+
+    //电池管理demo线程
+    std::thread t2([this]() {
+        while (true) {
+            demoThreadHandle2();
+        }
+    });
+    t2.detach();
 }
 
-void Verification::demoThreadHandle() {
+void Verification::demoThreadHandle1() {
+    usleep(1000 * 500);
+    m_srv.broadcast(can_buf_0x200, CAN_BUFFER_LEN);
     sleep(1);
-    m_srv.broadcast(buf_0x200, CAN_BUFFER_LEN);
+    m_srv.broadcast(can_buf_0x300, CAN_BUFFER_LEN);
     sleep(1);
-    m_srv.broadcast(buf_0x300, CAN_BUFFER_LEN);
+    m_srv.broadcast(can_buf_0x301, CAN_BUFFER_LEN);
+}
+
+void Verification::demoThreadHandle2() {
+    usleep(1000 * 1000);
+    m_srv.broadcast(can_buf_0x18FFFF01_0, CAN_BUFFER_LEN);
     sleep(1);
-    m_srv.broadcast(buf_0x301, CAN_BUFFER_LEN);
+    m_srv.broadcast(can_buf_0x18FFFF01_1, CAN_BUFFER_LEN);
+    sleep(1);
+    m_srv.broadcast(can_buf_0x1806E5F4, CAN_BUFFER_LEN);
 }
