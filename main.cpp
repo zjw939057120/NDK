@@ -22,6 +22,9 @@ TcpServer srv;
 Serial serial;
 
 int main(int argc, char *argv[]) {
+    if (!ToolKits::is_file_exists("/dev/ttyUSB0")) {
+        return 0;//非主系统,娱乐系统不存在EC20模块
+    }
     int port = 1883;
 
     hlog_set_level(LOG_LEVEL_DEBUG);
@@ -34,7 +37,8 @@ int main(int argc, char *argv[]) {
     printf("server listen on port %d, listenfd=%d ...\n", port, listenfd);
 
     ToolKits::EnvInit();
-    serial.Open();
+    serial.CANopen();
+    serial.MCUopen();
     Verification verification(serial, srv);
     srv.onConnection = [](const SocketChannelPtr &channel) {
         std::string peeraddr = channel->peeraddr();
@@ -66,14 +70,6 @@ int main(int argc, char *argv[]) {
     if (ToolKits::is_file_exists("/data/local/demo.lock")) {
         verification.demoThread();
     }
-
-    uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
-    while (true) {
-        if (serial.Receive(buffer, CAN_BUFFER_LEN) > 0) {
-            ToolKits::dump(buffer, CAN_BUFFER_LEN);
-            srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
-        }
-    }
-
+    verification.releaseThread();
     return 0;
 }

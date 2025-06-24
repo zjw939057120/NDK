@@ -22,11 +22,8 @@ bool Verification::Check(Buffer *buf) {
     //消息类型
     uint8_t msgType = buffer[0];
     switch (msgType) {
-        case 0x08://CAN标准帧
-        case 0x88://CAN扩展帧
-            m_serial.Send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
-            break;
-        default: {
+        case 0x01://系统消息
+        {
             //自定义消息
             ToolKits::dump(buffer, CAN_BUFFER_LEN);
             uint32_t tmp = 0;
@@ -36,25 +33,24 @@ bool Verification::Check(Buffer *buf) {
             //消息
             uint8_t msgBody[8];
             memcpy(&msgBody, &buffer[5], CAN_MSG_BODY_LEN);
-
             printf("msgType:0x%02x,msgId:0x%02x\n", msgType, msgId);
-            switch (msgType) {
-                case 0x00:
-                    //预留
-                    break;
-                case 0x01:
-                    //系统消息
-                    HandleMsg_0x01(buffer, msgId, msgBody);
-                    break;
-            }
+            MsgType_0x01(buffer, msgId, msgBody);
         }
             break;
+        case 0x02://MCU消息
+            m_serial.MCUsend(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+            break;
+        case 0x08://CAN标准帧
+        case 0x88://CAN扩展帧
+            m_serial.CANsend(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
+            break;
+        default:
+            break;
     }
-
     return true;
 }
 
-bool Verification::HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+bool Verification::MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     switch (msgId) {
         case 0x00:
             //预留
@@ -143,4 +139,43 @@ void Verification::demoThreadHandle2() {
     m_srv.broadcast(can_buf_0x18FFFF01_1, CAN_BUFFER_LEN);
     sleep(1);
     m_srv.broadcast(can_buf_0x1806E5F4, CAN_BUFFER_LEN);
+}
+
+void Verification::releaseThread() {
+    //CAN消息线程
+    std::thread t1([this]() {
+        while (true) {
+            CANreceiveThreadHandle();
+        }
+    });
+    t1.detach();
+
+    //MCU消息线程
+    std::thread t2([this]() {
+        while (true) {
+            MCUreceiveThreadHandle();
+        }
+    });
+    //等待线程结束
+    t2.join();
+}
+
+void Verification::CANreceiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN串口数据
+    while (true) {
+        if (m_serial.CANreceive(buffer, CAN_BUFFER_LEN) > 0) {
+            ToolKits::dump(buffer, CAN_BUFFER_LEN);
+            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+        }
+    }
+}
+
+void Verification::MCUreceiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取MCU串口数据
+    while (true) {
+        if (m_serial.MCUreceive(buffer, CAN_BUFFER_LEN) > 0) {
+            ToolKits::dump(buffer, CAN_BUFFER_LEN);
+            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+        }
+    }
 }

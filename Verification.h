@@ -24,13 +24,19 @@ public:
     /// @return 
     bool Check(Buffer *buf);
 
-    bool HandleMsg_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+    bool MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
 
     void demoThread();
 
     void demoThreadHandle1();
 
     void demoThreadHandle2();
+
+    void releaseThread();
+
+    void CANreceiveThreadHandle();
+
+    void MCUreceiveThreadHandle();
 
 private:
     Serial &m_serial;
