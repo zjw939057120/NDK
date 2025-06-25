@@ -57,16 +57,16 @@ int Serial::CANsetAttribs(int speed) {
     return 0;
 }
 
-int Serial::CANreceive(void *buf, size_t count) {
+ssize_t Serial::CANreceive(void *buf, size_t count) {
     return read(CANfd, buf, count); // 读取数据
 }
 
-int Serial::CANsend(const void *buf, size_t count) {
+ssize_t Serial::CANsend(const void *buf, size_t count) {
     std::lock_guard<std::mutex> lock(m_can_send_mutex);  // 自动加锁
     return write(CANfd, buf, count); // 写入数据
 }
 
-int Serial::CANsendTest() {
+ssize_t Serial::CANsendTest() {
     const char msg[13] = {0x08, 0x00, 0x00, 0x00, 0xff, 0x01, 0x02, 0x03, 0x040, 0x05, 0x06, 0x07, 0x08}; // 写入数据
     return CANsend(msg, sizeof(msg));
 }
@@ -124,16 +124,16 @@ int Serial::MCUsetAttribs(int speed) {
     return 0;
 }
 
-int Serial::MCUreceive(void *buf, size_t count) {
+ssize_t Serial::MCUreceive(void *buf, size_t count) {
     return read(MCUfd, buf, count); // 读取数据
 }
 
-int Serial::MCUsend(const void *buf, size_t count) {
+ssize_t Serial::MCUsend(const void *buf, size_t count) {
     std::lock_guard<std::mutex> lock(m_mcu_send_mutex);  // 自动加锁
     return write(MCUfd, buf, count); // 写入数据
 }
 
-int Serial::MCUsendTest() {
+ssize_t Serial::MCUsendTest() {
     const char msg[13] = {0x02, 0x00, 0x00, 0x00, 0x01, 0xff, 0xff, 0xff, 0x00, 0x01, 0xff, 0x01, 0x02}; // 写入数据
     return MCUsend(msg, sizeof(msg));
 }

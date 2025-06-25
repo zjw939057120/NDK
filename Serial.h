@@ -32,17 +32,17 @@ public:
     /// @param buf 
     /// @param count 
     /// @return 
-    int CANreceive(void *buf, size_t count);
+    ssize_t CANreceive(void *buf, size_t count);
 
     /// @brief 向串口发送数据
     /// @param buf 
     /// @param count 
     /// @return 
-    int CANsend(const void *buf, size_t count);
+    ssize_t CANsend(const void *buf, size_t count);
 
     /// @brief 向串口发送测试数据
     /// @return 
-    int CANsendTest();
+    ssize_t CANsendTest();
 
     int MCUopen();
 
@@ -50,11 +50,11 @@ public:
 
     int MCUsetAttribs(int speed);
 
-    int MCUreceive(void *buf, size_t count);
+    ssize_t MCUreceive(void *buf, size_t count);
 
-    int MCUsend(const void *buf, size_t count);
+    ssize_t MCUsend(const void *buf, size_t count);
 
-    int MCUsendTest();
+    ssize_t MCUsendTest();
 
 private:
     /// @brief 串口文件描述符，打开后用于读写操作

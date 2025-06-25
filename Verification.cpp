@@ -10,15 +10,16 @@ Verification::Verification(Serial &serial, TcpServer &srv) : m_serial(serial), m
 
 }
 
-bool Verification::Check(Buffer *buf) {
+bool Verification::onMessage(Buffer *buf) {
     size_t size = buf->size();
+    auto *buffer = static_cast<uint8_t *>(buf->data());
     //校验数据长度
-    if (size != CAN_BUFFER_LEN) {
+    ToolKits::dump(buffer, size);
+    if (size < CAN_BUFFER_LEN) {
         m_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
         return false;
     }
 
-    auto *buffer = static_cast<uint8_t *>(buf->data());
     //消息类型
     uint8_t msgType = buffer[0];
     switch (msgType) {
@@ -162,9 +163,11 @@ void Verification::releaseThread() {
 
 void Verification::CANreceiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN串口数据
+    ssize_t len = 0;
     while (true) {
-        if (m_serial.CANreceive(buffer, CAN_BUFFER_LEN) > 0) {
-            ToolKits::dump(buffer, CAN_BUFFER_LEN);
+        len = m_serial.CANreceive(buffer, CAN_BUFFER_LEN);
+        ToolKits::dump(buffer, len);
+        if (len == CAN_BUFFER_LEN) {
             m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
         }
     }
@@ -172,9 +175,11 @@ void Verification::CANreceiveThreadHandle() {
 
 void Verification::MCUreceiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取MCU串口数据
+    ssize_t len = 0;
     while (true) {
-        if (m_serial.MCUreceive(buffer, CAN_BUFFER_LEN) > 0) {
-            ToolKits::dump(buffer, CAN_BUFFER_LEN);
+        len = m_serial.MCUreceive(buffer, CAN_BUFFER_LEN);
+        ToolKits::dump(buffer, len);
+        if (len == CAN_BUFFER_LEN) {
             m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
         }
     }

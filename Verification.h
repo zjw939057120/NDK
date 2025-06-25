@@ -20,9 +20,9 @@ class Verification {
 public:
     Verification(Serial &serial, TcpServer &srv);
 
-    /// @brief  验证
+    /// @brief  TCP消息处理
     /// @return 
-    bool Check(Buffer *buf);
+    bool onMessage(Buffer *buf);
 
     bool MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
 

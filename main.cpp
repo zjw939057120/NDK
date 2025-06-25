@@ -51,7 +51,7 @@ int main(int argc, char *argv[]) {
         }
     };
     srv.onMessage = [&verification](const SocketChannelPtr &channel, Buffer *buf) {
-        verification.Check(buf);
+        verification.onMessage(buf);
     };
     srv.setThreadNum(4);
     srv.setLoadBalance(LB_LeastConnections);
