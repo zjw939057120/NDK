@@ -25,8 +25,6 @@ bool Verification::onMessage(Buffer *buf) {
     switch (msgType) {
         case 0x01://系统消息
         {
-            //自定义消息
-            ToolKits::dump(buffer, CAN_BUFFER_LEN);
             uint32_t tmp = 0;
             memcpy(&tmp, &buffer[1], CAN_MSG_ID_LEN);
             //消息ID
