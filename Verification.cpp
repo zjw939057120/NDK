@@ -141,26 +141,42 @@ void Verification::demoThreadHandle2() {
 }
 
 void Verification::releaseThread() {
-    //CAN消息线程
-    std::thread t1([this]() {
+    //CAN模块消息线程
+    std::thread t0([this]() {
         while (true) {
             UART0_receiveThreadHandle();
         }
     });
-    t1.detach();
+    t0.detach();
 
-    //MCU消息线程
-    std::thread t2([this]() {
+    //MCU模块消息线程
+    std::thread t1([this]() {
         while (true) {
             UART1_receiveThreadHandle();
         }
     });
+    t1.detach();
+
+    //惯导模块消息线程
+    std::thread t2([this]() {
+        while (true) {
+            UART2_receiveThreadHandle();
+        }
+    });
+    t2.detach();
+
+    //继电器模块消息线程
+    std::thread t3([this]() {
+        while (true) {
+            UART3_receiveThreadHandle();
+        }
+    });
     //等待线程结束
-    t2.join();
+    t3.join();
 }
 
 void Verification::UART0_receiveThreadHandle() {
-    uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN串口数据
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN模块串口数据
     ssize_t len = 0;
     while (true) {
         len = m_serial.UART0_receive(buffer, CAN_BUFFER_LEN);
@@ -172,10 +188,34 @@ void Verification::UART0_receiveThreadHandle() {
 }
 
 void Verification::UART1_receiveThreadHandle() {
-    uint8_t buffer[CAN_BUFFER_LEN]; // 读取MCU串口数据
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取MCU模块串口数据
     ssize_t len = 0;
     while (true) {
         len = m_serial.UART1_receive(buffer, CAN_BUFFER_LEN);
+        ToolKits::dump(buffer, len);
+        if (len == CAN_BUFFER_LEN) {
+            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+        }
+    }
+}
+
+void Verification::UART2_receiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取惯导模块串口数据
+    ssize_t len = 0;
+    while (true) {
+        len = m_serial.UART2_receive(buffer, CAN_BUFFER_LEN);
+        ToolKits::dump(buffer, len);
+        if (len == CAN_BUFFER_LEN) {
+            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+        }
+    }
+}
+
+void Verification::UART3_receiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取继电器串口数据
+    ssize_t len = 0;
+    while (true) {
+        len = m_serial.UART3_receive(buffer, CAN_BUFFER_LEN);
         ToolKits::dump(buffer, len);
         if (len == CAN_BUFFER_LEN) {
             m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端

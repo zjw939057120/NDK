@@ -38,6 +38,9 @@ public:
 
     void UART1_receiveThreadHandle();
 
+    void UART2_receiveThreadHandle();
+
+    void UART3_receiveThreadHandle();
 private:
     Serial &m_serial;
     TcpServer &m_srv;

@@ -14,16 +14,28 @@
 
 #define UART_8CHN
 
+//CAN模块
 #define UART0_PATH "/dev/ttyACM0"
+#define UART0_SPEED B115200
+//MCU模块
 #define UART1_PATH "/dev/ttyACM1"
+#define UART1_SPEED B115200
+//惯导模块
 #define UART2_PATH "/dev/ttyACM2"
+#define UART2_SPEED B9600
+//继电器模块
 #define UART3_PATH "/dev/ttyACM3"
+#define UART3_SPEED B9600
 
 #ifdef UART_8CHN
 #define UART4_PATH "/dev/ttyACM4"
+#define UART4_SPEED B115200
 #define UART5_PATH "/dev/ttyACM5"
+#define UART5_SPEED B115200
 #define UART6_PATH "/dev/ttyACM6"
+#define UART6_SPEED B115200
 #define UART7_PATH "/dev/ttyACM7"
+#define UART7_SPEED B115200
 #endif
 
 class Serial {
