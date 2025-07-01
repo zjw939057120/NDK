@@ -34,9 +34,9 @@ public:
 
     void releaseThread();
 
-    void CANreceiveThreadHandle();
+    void UART0_receiveThreadHandle();
 
-    void MCUreceiveThreadHandle();
+    void UART1_receiveThreadHandle();
 
 private:
     Serial &m_serial;

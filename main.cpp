@@ -23,7 +23,7 @@ Serial serial;
 
 int main(int argc, char *argv[]) {
     if (!ToolKits::is_file_exists("/dev/ttyUSB0")) {
-        return 0;//非主系统,娱乐系统不存在EC20模块
+        //return 0;//非主系统,娱乐系统不存在EC20模块
     }
     int port = 1883;
 
@@ -37,8 +37,9 @@ int main(int argc, char *argv[]) {
     printf("server listen on port %d, listenfd=%d ...\n", port, listenfd);
 
     ToolKits::EnvInit();
-    serial.CANopen();
-    serial.MCUopen();
+    serial.UART0_open();//打开CAN串口
+    serial.UART1_open();//打开控制器串口
+
     Verification verification(serial, srv);
     srv.onConnection = [](const SocketChannelPtr &channel) {
         std::string peeraddr = channel->peeraddr();

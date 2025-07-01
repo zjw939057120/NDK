@@ -37,11 +37,11 @@ bool Verification::onMessage(Buffer *buf) {
         }
             break;
         case 0x02://MCU消息
-            m_serial.MCUsend(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+            m_serial.UART1_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
             break;
         case 0x08://CAN标准帧
         case 0x88://CAN扩展帧
-            m_serial.CANsend(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
+            m_serial.UART0_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
             break;
         default:
             break;
@@ -144,7 +144,7 @@ void Verification::releaseThread() {
     //CAN消息线程
     std::thread t1([this]() {
         while (true) {
-            CANreceiveThreadHandle();
+            UART0_receiveThreadHandle();
         }
     });
     t1.detach();
@@ -152,18 +152,18 @@ void Verification::releaseThread() {
     //MCU消息线程
     std::thread t2([this]() {
         while (true) {
-            MCUreceiveThreadHandle();
+            UART1_receiveThreadHandle();
         }
     });
     //等待线程结束
     t2.join();
 }
 
-void Verification::CANreceiveThreadHandle() {
+void Verification::UART0_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN串口数据
     ssize_t len = 0;
     while (true) {
-        len = m_serial.CANreceive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.UART0_receive(buffer, CAN_BUFFER_LEN);
         ToolKits::dump(buffer, len);
         if (len == CAN_BUFFER_LEN) {
             m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
@@ -171,11 +171,11 @@ void Verification::CANreceiveThreadHandle() {
     }
 }
 
-void Verification::MCUreceiveThreadHandle() {
+void Verification::UART1_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取MCU串口数据
     ssize_t len = 0;
     while (true) {
-        len = m_serial.MCUreceive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.UART1_receive(buffer, CAN_BUFFER_LEN);
         ToolKits::dump(buffer, len);
         if (len == CAN_BUFFER_LEN) {
             m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
