@@ -64,6 +64,13 @@ ssize_t Serial::UART_send(int &fd, const void *buf, size_t count) {
     return write(fd, buf, count); // 写入数据
 }
 
+void Serial::UART_init() {
+    UART0_open();//打开CAN模块
+    UART1_open();//打开MCU模块
+    UART2_open();//打开继电器模块
+    UART3_open();//打开惯导模块
+}
+
 int Serial::UART0_open() {
     return UART_open(UART0_PATH, uart0_fd, UART0_SPEED);
 }
@@ -152,7 +159,6 @@ ssize_t Serial::UART3_sendTest() {
     return UART3_send(msg, sizeof(msg));
 }
 
-#ifdef UART_8CHN
 
 int Serial::UART4_open() {
     return UART_open(UART4_PATH, uart4_fd, UART4_SPEED);
@@ -242,5 +248,3 @@ ssize_t Serial::UART7_sendTest() {
     const char msg[13] = {0x08, 0x00, 0x00, 0x00, 0xff, 0x01, 0x02, 0x03, 0x040, 0x05, 0x06, 0x07, 0x08}; // 写入数据
     return UART7_send(msg, sizeof(msg));
 }
-
-#endif

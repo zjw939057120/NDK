@@ -12,7 +12,6 @@
 #include <termios.h>
 #include <mutex>
 
-#define UART_8CHN
 
 //CAN模块
 #define UART0_PATH "/dev/ttyACM0"
@@ -22,25 +21,28 @@
 #define UART1_SPEED B115200
 //惯导模块
 #define UART2_PATH "/dev/ttyACM2"
-#define UART2_SPEED B9600
+#define UART2_SPEED B115200
 //继电器模块
 #define UART3_PATH "/dev/ttyACM3"
-#define UART3_SPEED B9600
+#define UART3_SPEED B115200
 
-#ifdef UART_8CHN
 #define UART4_PATH "/dev/ttyACM4"
 #define UART4_SPEED B115200
+
 #define UART5_PATH "/dev/ttyACM5"
 #define UART5_SPEED B115200
+
 #define UART6_PATH "/dev/ttyACM6"
 #define UART6_SPEED B115200
+
 #define UART7_PATH "/dev/ttyACM7"
 #define UART7_SPEED B115200
-#endif
 
 class Serial {
 
 public:
+    void UART_init();
+
     int UART0_open();
 
     int UART0_close();
@@ -81,7 +83,6 @@ public:
 
     ssize_t UART3_sendTest();
 
-#ifdef UART_8CHN
 
     int UART4_open();
 
@@ -123,7 +124,6 @@ public:
 
     ssize_t UART7_sendTest();
 
-#endif
 private:
     /// @brief 打开串口设备
     /// @return
@@ -156,23 +156,19 @@ private:
     int uart1_fd = 0;
     int uart2_fd = 0;
     int uart3_fd = 0;
-#ifdef UART_8CHN
     int uart4_fd = 0;
     int uart5_fd = 0;
     int uart6_fd = 0;
     int uart7_fd = 0;
-#endif
 
     std::mutex uart0_mutex;
     std::mutex uart1_mutex;
     std::mutex uart2_mutex;
     std::mutex uart3_mutex;
-#ifdef UART_8CHN
     std::mutex uart4_mutex;
     std::mutex uart5_mutex;
     std::mutex uart6_mutex;
     std::mutex uart7_mutex;
-#endif
 };
 
 #endif // TCPSERVER_SERIAL_H

@@ -36,11 +36,10 @@ int main(int argc, char *argv[]) {
     printf("Build Time: %s %s\n", __TIME__, __DATE__);
     printf("server listen on port %d, listenfd=%d ...\n", port, listenfd);
 
+    //环境初始化
     ToolKits::EnvInit();
-    serial.UART0_open();//打开CAN模块
-    serial.UART1_open();//打开MCU模块
-    serial.UART2_open();//打开惯导模块
-    serial.UART3_open();//打开继电器模块
+    //串口初始化
+    serial.UART_init();
 
     Verification verification(serial, srv);
     srv.onConnection = [](const SocketChannelPtr &channel) {

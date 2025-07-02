@@ -39,6 +39,12 @@ bool Verification::onMessage(Buffer *buf) {
         case 0x02://MCU消息
             m_serial.UART1_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
             break;
+        case 0x03://继电器消息
+            m_serial.UART2_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+            break;
+        case 0x04://惯导消息
+            m_serial.UART3_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+            break;
         case 0x08://CAN标准帧
         case 0x88://CAN扩展帧
             m_serial.UART0_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
@@ -157,7 +163,7 @@ void Verification::releaseThread() {
     });
     t1.detach();
 
-    //惯导模块消息线程
+    //继电器模块消息线程
     std::thread t2([this]() {
         while (true) {
             UART2_receiveThreadHandle();
@@ -165,7 +171,7 @@ void Verification::releaseThread() {
     });
     t2.detach();
 
-    //继电器模块消息线程
+    //惯导模块消息线程
     std::thread t3([this]() {
         while (true) {
             UART3_receiveThreadHandle();
@@ -177,48 +183,96 @@ void Verification::releaseThread() {
 
 void Verification::UART0_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN模块串口数据
-    ssize_t len = 0;
+    ssize_t len;
     while (true) {
         len = m_serial.UART0_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART0:");
         ToolKits::dump(buffer, len);
-        if (len == CAN_BUFFER_LEN) {
-            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
-        }
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
     }
 }
 
 void Verification::UART1_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取MCU模块串口数据
-    ssize_t len = 0;
+    ssize_t len;
     while (true) {
         len = m_serial.UART1_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART1:");
         ToolKits::dump(buffer, len);
-        if (len == CAN_BUFFER_LEN) {
-            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
-        }
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
     }
 }
 
 void Verification::UART2_receiveThreadHandle() {
-    uint8_t buffer[CAN_BUFFER_LEN]; // 读取惯导模块串口数据
-    ssize_t len = 0;
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取继电器串口数据
+    ssize_t len;
     while (true) {
         len = m_serial.UART2_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART2:");
         ToolKits::dump(buffer, len);
-        if (len == CAN_BUFFER_LEN) {
-            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
-        }
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
     }
 }
 
 void Verification::UART3_receiveThreadHandle() {
-    uint8_t buffer[CAN_BUFFER_LEN]; // 读取继电器串口数据
-    ssize_t len = 0;
+    uint8_t buffer[IMU_BUFFER_LEN]; // 读取继电器串口数据
+    ssize_t len;
     while (true) {
-        len = m_serial.UART3_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.UART3_receive(buffer, IMU_BUFFER_LEN);
+        if (len != IMU_BUFFER_LEN) continue;
+        printf("UART3:");
         ToolKits::dump(buffer, len);
-        if (len == CAN_BUFFER_LEN) {
-            m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
-        }
+        m_srv.broadcast((const void *) buffer, IMU_BUFFER_LEN); // 转发串口数据到tcp客户端
+    }
+}
+
+void Verification::UART4_receiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
+    ssize_t len;
+    while (true) {
+        len = m_serial.UART4_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART4:");
+        ToolKits::dump(buffer, len);
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+    }
+}
+
+void Verification::UART5_receiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
+    ssize_t len;
+    while (true) {
+        len = m_serial.UART5_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART5:");
+        ToolKits::dump(buffer, len);
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+    }
+}
+
+void Verification::UART6_receiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
+    ssize_t len;
+    while (true) {
+        len = m_serial.UART6_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART6:");
+        ToolKits::dump(buffer, len);
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
+    }
+}
+
+void Verification::UART7_receiveThreadHandle() {
+    uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
+    ssize_t len;
+    while (true) {
+        len = m_serial.UART7_receive(buffer, CAN_BUFFER_LEN);
+        if (len != CAN_BUFFER_LEN) continue;
+        printf("UART7:");
+        ToolKits::dump(buffer, len);
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
     }
 }

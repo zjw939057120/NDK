@@ -10,10 +10,13 @@
 #include "hv/TcpServer.h"
 #include "Serial.h"
 
+//CAN模块缓冲区长度
 #define CAN_BUFFER_LEN 13
-#define CAN_MSG_TYPE_LEN 1
 #define CAN_MSG_ID_LEN 4
 #define CAN_MSG_BODY_LEN 8
+//惯导模块缓冲区长度
+#define IMU_BUFFER_LEN 11
+
 using namespace hv;
 
 class Verification {
@@ -41,6 +44,15 @@ public:
     void UART2_receiveThreadHandle();
 
     void UART3_receiveThreadHandle();
+
+    void UART4_receiveThreadHandle();
+
+    void UART5_receiveThreadHandle();
+
+    void UART6_receiveThreadHandle();
+
+    void UART7_receiveThreadHandle();
+
 private:
     Serial &m_serial;
     TcpServer &m_srv;
@@ -63,6 +75,9 @@ private:
     //充电机接收信息(扩展帧)
     const uint8_t can_buf_0x1806E5F4[CAN_BUFFER_LEN] = {0x88, 0x18, 0x06, 0xE5, 0xF4, 0x02, 0x48, 0x08, 0xFC, 0x00,
                                                         0x00, 0x00, 0x00};
+
+    //惯导模块
+    const uint8_t imu_buf_0x0551[IMU_BUFFER_LEN] = {0x55, 0x51, 0xdb, 0x00, 0x19, 0x00, 0xf8, 0x07, 0x5f, 0x0b, 0x03};
 };
 
 #endif // TCPSERVER_VERIFICATION_H

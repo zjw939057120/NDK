@@ -6,7 +6,8 @@
 #include "ToolKits.h"
 
 void ToolKits::EnvInit() {
-    getSerial();
+    getSerialNumber();
+
     GPIOInit(SWITCH_1);
     GPIOInit(SWITCH_2);
     GPIOInit(SWITCH_3);
@@ -64,7 +65,7 @@ std::string ToolKits::execCommand(const char *cmd) {
     return buffer;
 }
 
-std::string ToolKits::getSerial() {
+std::string ToolKits::getSerialNumber() {
     char command[255];
     sprintf(command, "grep \"Serial\" /proc/cpuinfo  | cut -d':' -f2 | xargs | tr -d '\\n'");
     std::string ret = execCommand(command);

@@ -31,7 +31,7 @@ public:
 
     static std::string execCommand(const char *cmd);
 
-    static std::string getSerial();
+    static std::string getSerialNumber();
 
     static void dump(const uint8_t *data, size_t len);
 
