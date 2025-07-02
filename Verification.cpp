@@ -112,6 +112,14 @@ bool Verification::MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *
 
 void Verification::demoThread() {
     //推进器demo线程
+    std::thread t0([this]() {
+        while (true) {
+            demoThreadHandle0();
+        }
+    });
+    t0.detach();
+
+    //电池管理demo线程
     std::thread t1([this]() {
         while (true) {
             demoThreadHandle1();
@@ -119,7 +127,7 @@ void Verification::demoThread() {
     });
     t1.detach();
 
-    //电池管理demo线程
+    //惯导模块demo线程
     std::thread t2([this]() {
         while (true) {
             demoThreadHandle2();
@@ -128,8 +136,9 @@ void Verification::demoThread() {
     t2.detach();
 }
 
-void Verification::demoThreadHandle1() {
-    usleep(1000 * 500);
+void Verification::demoThreadHandle0() {
+    usleep(1000 * 200);
+    //广播推进器测试数据
     m_srv.broadcast(can_buf_0x200, CAN_BUFFER_LEN);
     sleep(1);
     m_srv.broadcast(can_buf_0x300, CAN_BUFFER_LEN);
@@ -137,13 +146,27 @@ void Verification::demoThreadHandle1() {
     m_srv.broadcast(can_buf_0x301, CAN_BUFFER_LEN);
 }
 
-void Verification::demoThreadHandle2() {
-    usleep(1000 * 1000);
+void Verification::demoThreadHandle1() {
+    usleep(1000 * 500);
+    //广播电池测试数据
     m_srv.broadcast(can_buf_0x18FFFF01_0, CAN_BUFFER_LEN);
     sleep(1);
     m_srv.broadcast(can_buf_0x18FFFF01_1, CAN_BUFFER_LEN);
     sleep(1);
     m_srv.broadcast(can_buf_0x1806E5F4, CAN_BUFFER_LEN);
+    sleep(1);
+}
+
+void Verification::demoThreadHandle2() {
+    usleep(1000 * 300);
+    //广播惯导模块测试数据
+    m_srv.broadcast(imu_buf_0x0551, IMU_BUFFER_LEN);
+    sleep(1);
+    m_srv.broadcast(imu_buf_0x0552, IMU_BUFFER_LEN);
+    sleep(1);
+    m_srv.broadcast(imu_buf_0x0553, IMU_BUFFER_LEN);
+    sleep(1);
+    m_srv.broadcast(imu_buf_0x0554, IMU_BUFFER_LEN);
 }
 
 void Verification::releaseThread() {
