@@ -37,17 +37,18 @@ bool Verification::onMessage(Buffer *buf) {
         }
             break;
         case 0x02://MCU消息
-            m_serial.UART1_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+            m_serial.UART1_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
             break;
         case 0x03://继电器消息
-            m_serial.UART2_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+            m_serial.UART2_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
             break;
-        case 0x04://惯导消息
-            m_serial.UART3_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
+        case 0x55://惯导消息
+            //13字节转11字节
+            m_serial.UART3_send(&buffer[CAN_BUFFER_LEN - IMU_BUFFER_LEN], IMU_BUFFER_LEN); // 转发tcp客户端数据到MCU串口
             break;
         case 0x08://CAN标准帧
         case 0x88://CAN扩展帧
-            m_serial.UART0_send(buf->data(), CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
+            m_serial.UART0_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
             break;
         default:
             break;
@@ -160,13 +161,13 @@ void Verification::demoThreadHandle1() {
 void Verification::demoThreadHandle2() {
     usleep(1000 * 300);
     //广播惯导模块测试数据
-    m_srv.broadcast(imu_buf_0x0551, IMU_BUFFER_LEN);
+    m_srv.broadcast(imu_buf_0x0551, CAN_BUFFER_LEN);
     sleep(1);
-    m_srv.broadcast(imu_buf_0x0552, IMU_BUFFER_LEN);
+    m_srv.broadcast(imu_buf_0x0552, CAN_BUFFER_LEN);
     sleep(1);
-    m_srv.broadcast(imu_buf_0x0553, IMU_BUFFER_LEN);
+    m_srv.broadcast(imu_buf_0x0553, CAN_BUFFER_LEN);
     sleep(1);
-    m_srv.broadcast(imu_buf_0x0554, IMU_BUFFER_LEN);
+    m_srv.broadcast(imu_buf_0x0554, CAN_BUFFER_LEN);
 }
 
 void Verification::releaseThread() {
@@ -241,14 +242,14 @@ void Verification::UART2_receiveThreadHandle() {
 }
 
 void Verification::UART3_receiveThreadHandle() {
-    uint8_t buffer[IMU_BUFFER_LEN]; // 读取继电器串口数据
+    uint8_t buffer[CAN_BUFFER_LEN] = {0x55, 0x00}; // 读取惯串口数据
     ssize_t len;
     while (true) {
-        len = m_serial.UART3_receive(buffer, IMU_BUFFER_LEN);
+        len = m_serial.UART3_receive(&buffer[CAN_BUFFER_LEN - IMU_BUFFER_LEN], IMU_BUFFER_LEN);//11字节转13字节
         if (len != IMU_BUFFER_LEN) continue;
         printf("UART3:");
         ToolKits::dump(buffer, len);
-        m_srv.broadcast((const void *) buffer, IMU_BUFFER_LEN); // 转发串口数据到tcp客户端
+        m_srv.broadcast((const void *) buffer, CAN_BUFFER_LEN); // 转发串口数据到tcp客户端
     }
 }
 
