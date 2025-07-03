@@ -16,7 +16,7 @@
 //CAN模块
 #define UART0_PATH "/dev/ttyACM0"
 #define UART0_SPEED B115200
-//MCU模块
+//控制器模块
 #define UART1_PATH "/dev/ttyACM1"
 #define UART1_SPEED B115200
 //惯导模块
@@ -45,6 +45,8 @@ public:
 
     int UART0_open();
 
+    int UART0_fd();
+
     int UART0_close();
 
     ssize_t UART0_receive(void *buf, size_t count);
@@ -54,6 +56,8 @@ public:
     ssize_t UART0_sendTest();
 
     int UART1_open();
+
+    int UART1_fd();
 
     int UART1_close();
 
@@ -65,6 +69,8 @@ public:
 
     int UART2_open();
 
+    int UART2_fd();
+
     int UART2_close();
 
     ssize_t UART2_receive(void *buf, size_t count);
@@ -74,6 +80,8 @@ public:
     ssize_t UART2_sendTest();
 
     int UART3_open();
+
+    int UART3_fd();
 
     int UART3_close();
 
@@ -86,6 +94,8 @@ public:
 
     int UART4_open();
 
+    int UART4_fd();
+
     int UART4_close();
 
     ssize_t UART4_receive(void *buf, size_t count);
@@ -95,6 +105,8 @@ public:
     ssize_t UART4_sendTest();
 
     int UART5_open();
+
+    int UART5_fd();
 
     int UART5_close();
 
@@ -106,6 +118,8 @@ public:
 
     int UART6_open();
 
+    int UART6_fd();
+
     int UART6_close();
 
     ssize_t UART6_receive(void *buf, size_t count);
@@ -115,6 +129,8 @@ public:
     ssize_t UART6_sendTest();
 
     int UART7_open();
+
+    int UART7_fd();
 
     int UART7_close();
 

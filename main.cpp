@@ -22,8 +22,8 @@ TcpServer srv;
 Serial serial;
 
 int main(int argc, char *argv[]) {
-    if (!ToolKits::is_file_exists("/dev/ttyUSB0")) {
-        //return 0;//非主系统,娱乐系统不存在EC20模块
+    if (!ToolKits::is_file_exists(UART0_PATH)) {
+        return 0;//非主系统,娱乐系统不存在串口模块
     }
     int port = 1883;
 
@@ -73,5 +73,9 @@ int main(int argc, char *argv[]) {
         verification.demoThread();
     }
     verification.releaseThread();
+
+    while (true) {
+        sleep(60);
+    }
     return 0;
 }

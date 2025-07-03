@@ -3,6 +3,7 @@
 //
 
 #include "Serial.h"
+#include "ToolKits.h"
 
 int Serial::UART_open(const char *path, int &fd, int speed) {
     fd = open(path, O_RDWR | O_NOCTTY | O_SYNC);
@@ -65,14 +66,22 @@ ssize_t Serial::UART_send(int &fd, const void *buf, size_t count) {
 }
 
 void Serial::UART_init() {
-    UART0_open();//打开CAN模块
-    UART1_open();//打开MCU模块
-    UART2_open();//打开继电器模块
-    UART3_open();//打开惯导模块
+    //打开CAN模块
+    if (ToolKits::is_file_exists(UART0_PATH)) UART0_open();
+    //打开控制器模块
+    if (ToolKits::is_file_exists(UART1_PATH)) UART1_open();
+    //打开继电器模块
+    if (ToolKits::is_file_exists(UART2_PATH)) UART2_open();
+    //打开惯导模块
+    if (ToolKits::is_file_exists(UART3_PATH)) UART3_open();
 }
 
 int Serial::UART0_open() {
     return UART_open(UART0_PATH, uart0_fd, UART0_SPEED);
+}
+
+int Serial::UART0_fd() {
+    return uart0_fd;
 }
 
 int Serial::UART0_close() {
@@ -97,6 +106,10 @@ int Serial::UART1_open() {
     return UART_open(UART1_PATH, uart1_fd, UART1_SPEED);
 }
 
+int Serial::UART1_fd() {
+    return uart1_fd;
+}
+
 int Serial::UART1_close() {
     return UART_close(uart1_fd);
 }
@@ -119,6 +132,10 @@ int Serial::UART2_open() {
     return UART_open(UART2_PATH, uart2_fd, UART2_SPEED);
 }
 
+int Serial::UART2_fd() {
+    return uart2_fd;
+}
+
 int Serial::UART2_close() {
     return UART_close(uart2_fd);
 }
@@ -139,6 +156,10 @@ ssize_t Serial::UART2_sendTest() {
 
 int Serial::UART3_open() {
     return UART_open(UART3_PATH, uart3_fd, UART3_SPEED);
+}
+
+int Serial::UART3_fd() {
+    return uart3_fd;
 }
 
 int Serial::UART3_close() {
@@ -164,6 +185,10 @@ int Serial::UART4_open() {
     return UART_open(UART4_PATH, uart4_fd, UART4_SPEED);
 }
 
+int Serial::UART4_fd() {
+    return uart4_fd;
+}
+
 int Serial::UART4_close() {
     return UART_close(uart4_fd);
 }
@@ -184,6 +209,10 @@ ssize_t Serial::UART4_sendTest() {
 
 int Serial::UART5_open() {
     return UART_open(UART5_PATH, uart5_fd, UART5_SPEED);
+}
+
+int Serial::UART5_fd() {
+    return uart5_fd;
 }
 
 int Serial::UART5_close() {
@@ -209,6 +238,10 @@ int Serial::UART6_open() {
     return UART_open(UART6_PATH, uart6_fd, UART6_SPEED);
 }
 
+int Serial::UART6_fd() {
+    return uart6_fd;
+}
+
 int Serial::UART6_close() {
     return UART_close(uart6_fd);
 }
@@ -229,6 +262,10 @@ ssize_t Serial::UART6_sendTest() {
 
 int Serial::UART7_open() {
     return UART_open(UART7_PATH, uart7_fd, UART7_SPEED);
+}
+
+int Serial::UART7_fd() {
+    return uart7_fd;
 }
 
 int Serial::UART7_close() {
