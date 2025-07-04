@@ -14,28 +14,28 @@
 
 
 //CAN模块
-#define UART0_PATH "/dev/ttyACM0"
+#define UART0_PATH "/dev/ttyCH9344USB0"
 #define UART0_SPEED B115200
 //控制器模块
-#define UART1_PATH "/dev/ttyACM1"
+#define UART1_PATH "/dev/ttyCH9344USB1"
 #define UART1_SPEED B115200
 //惯导模块
-#define UART2_PATH "/dev/ttyACM2"
+#define UART2_PATH "/dev/ttyCH9344USB2"
 #define UART2_SPEED B115200
 //继电器模块
-#define UART3_PATH "/dev/ttyACM3"
+#define UART3_PATH "/dev/ttyCH9344USB3"
 #define UART3_SPEED B115200
 
-#define UART4_PATH "/dev/ttyACM4"
+#define UART4_PATH "/dev/ttyCH9344USB4"
 #define UART4_SPEED B115200
 
-#define UART5_PATH "/dev/ttyACM5"
+#define UART5_PATH "/dev/ttyCH9344USB5"
 #define UART5_SPEED B115200
 
-#define UART6_PATH "/dev/ttyACM6"
+#define UART6_PATH "/dev/ttyCH9344USB6"
 #define UART6_SPEED B115200
 
-#define UART7_PATH "/dev/ttyACM7"
+#define UART7_PATH "/dev/ttyCH9344USB7"
 #define UART7_SPEED B115200
 
 class Serial {
