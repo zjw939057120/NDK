@@ -26,53 +26,47 @@ public:
 
     /// @brief  TCP消息处理
     /// @return
-    bool onMessage(Buffer *buf);
+    void svr0_onMessageCallback(Buffer *buf);
 
-    bool MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+    /// @brief  TCP消息处理
+    /// @return
+    void svr1_onMessageCallback(Buffer *buf);
 
-    void URAT_demoThread();
+    /// @brief  TCP消息处理
+    /// @return
+    void svr2_onMessageCallback(Buffer *buf);
 
-    void UART_releaseThread();
+    /// @brief  TCP消息处理
+    /// @return
+    void svr3_onMessageCallback(Buffer *buf);
+
+    void MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    void svr_demoThread();
 
 private:
-    void UART0_demoThreadHandle();
+    void svr0_demoThreadHandle();
 
-    void UART1_demoThreadHandle();
+    void svr1_demoThreadHandle();
 
-    void UART2_demoThreadHandle();
+    void svr2_demoThreadHandle();
 
-    void UART3_demoThreadHandle();
+    void svr3_demoThreadHandle();
 
-    void UART4_demoThreadHandle();
+    void svr4_demoThreadHandle();
 
-    void UART5_demoThreadHandle();
+    void svr5_demoThreadHandle();
 
-    void UART6_demoThreadHandle();
+    void svr6_demoThreadHandle();
 
-    void UART7_demoThreadHandle();
-
-    void UART0_receiveThreadHandle();
-
-    void UART1_receiveThreadHandle();
-
-    void UART2_receiveThreadHandle();
-
-    void UART3_receiveThreadHandle();
-
-    void UART4_receiveThreadHandle();
-
-    void UART5_receiveThreadHandle();
-
-    void UART6_receiveThreadHandle();
-
-    void UART7_receiveThreadHandle();
+    void svr7_demoThreadHandle();
 
 private:
     Serial &m_serial;
-    TcpServer &m_UART0_srv;
-    TcpServer &m_UART1_srv;
-    TcpServer &m_UART2_srv;
-    TcpServer &m_UART3_srv;
+    TcpServer &m_srv_0;
+    TcpServer &m_srv_1;
+    TcpServer &m_srv_2;
+    TcpServer &m_srv_3;
 
     const uint8_t can_buf_empty[CAN_BUFFER_LEN] = {0};
     //推进器控制报文

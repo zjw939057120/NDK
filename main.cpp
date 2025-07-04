@@ -12,14 +12,18 @@
 #include "hv/TcpServer.h"
 #include "Serial.h"
 #include "Verification.h"
+#include "VerificationReceive.h"
 #include "ToolKits.h"
 
 using namespace hv;
 
 #define TEST_TLS 0
 
+void onMessageCallback(Buffer *buf) {
+}
 
-int UART_TcpServer(TcpServer &srv, int port, Verification &verification) {
+int UART_TcpServer(TcpServer &srv, int port, Verification &verification,
+                   const std::function<void(Buffer *)> &onMessage) {
     hlog_set_level(LOG_LEVEL_DEBUG);
 
     int listenfd = srv.createsocket(port);
@@ -37,8 +41,8 @@ int UART_TcpServer(TcpServer &srv, int port, Verification &verification) {
                    currentThreadEventLoop->tid());
         }
     };
-    srv.onMessage = [&verification](const SocketChannelPtr &channel, Buffer *buf) {
-        verification.onMessage(buf);
+    srv.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
+        onMessage(buf);
     };
     srv.setThreadNum(4);
     srv.setLoadBalance(LB_LeastConnections);
@@ -64,27 +68,35 @@ int main(int argc, char *argv[]) {
     }*/
     Serial serial;
 
-    TcpServer UART0_srv;
-    TcpServer UART1_srv;
-    TcpServer UART2_srv;
-    TcpServer UART3_srv;
+    TcpServer srv_0;
+    TcpServer srv_1;
+    TcpServer srv_2;
+    TcpServer srv_3;
 
     //环境初始化
     ToolKits::EnvInit();
     //串口初始化
     serial.UART_init();
 
-    Verification verification(serial, UART0_srv, UART1_srv, UART2_srv, UART3_srv);
+    Verification verification(serial, srv_0, srv_1, srv_2, srv_3);
+    VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
 
-    UART_TcpServer(UART0_srv, 1880, verification);
-    UART_TcpServer(UART1_srv, 1881, verification);
-    UART_TcpServer(UART2_srv, 1882, verification);
-    UART_TcpServer(UART3_srv, 1883, verification);
+    UART_TcpServer(srv_0, 1880, verification,
+                   std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
+
+    UART_TcpServer(srv_1, 1881, verification,
+                   std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
+
+    UART_TcpServer(srv_2, 1882, verification,
+                   std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
+
+    UART_TcpServer(srv_3, 1883, verification,
+                   std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 
     if (ToolKits::is_file_exists("/data/local/demo.lock")) {
-        verification.URAT_demoThread();
+        verification.svr_demoThread();
     }
-    verification.UART_releaseThread();
+    verificationReceive.UART_receiveThread();
 
     while (true) {
         sleep(120);

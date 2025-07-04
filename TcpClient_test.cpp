@@ -18,7 +18,7 @@
 using namespace hv;
 
 int main(int argc, char *argv[]) {
-    int remote_port = argc < 2 ? 1883 : atoi(argv[1]);
+    int remote_port = argc < 2 ? 1880 : atoi(argv[1]);
     const char *remote_host = "127.0.0.1";
     if (argc > 2) {
         remote_host = argv[2];

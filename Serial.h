@@ -19,10 +19,10 @@
 //控制器模块
 #define UART1_PATH "/dev/ttyCH9344USB1"
 #define UART1_SPEED B115200
-//惯导模块
-#define UART2_PATH "/dev/ttyCH9344USB2"
-#define UART2_SPEED B115200
 //继电器模块
+#define UART2_PATH "/dev/ttyCH9344USB2"
+#define UART2_SPEED B38400
+//惯导模块
 #define UART3_PATH "/dev/ttyCH9344USB3"
 #define UART3_SPEED B115200
 
