@@ -76,22 +76,15 @@ int main(int argc, char *argv[]) {
 
     Verification verification(serial, UART0_srv, UART1_srv, UART2_srv, UART3_srv);
 
-    if (ToolKits::is_file_exists(UART0_PATH))
-        UART_TcpServer(UART0_srv, 1880, verification);
-
-    if (ToolKits::is_file_exists(UART1_PATH))
-        UART_TcpServer(UART1_srv, 1881, verification);
-
-    if (ToolKits::is_file_exists(UART2_PATH))
-        UART_TcpServer(UART2_srv, 1882, verification);
-
-    if (ToolKits::is_file_exists(UART3_PATH))
-        UART_TcpServer(UART3_srv, 1883, verification);
+    UART_TcpServer(UART0_srv, 1880, verification);
+    UART_TcpServer(UART1_srv, 1881, verification);
+    UART_TcpServer(UART2_srv, 1882, verification);
+    UART_TcpServer(UART3_srv, 1883, verification);
 
     if (ToolKits::is_file_exists("/data/local/demo.lock")) {
-        verification.demoThread();
+        verification.URAT_demoThread();
     }
-    verification.releaseThread();
+    verification.UART_releaseThread();
 
     while (true) {
         sleep(120);

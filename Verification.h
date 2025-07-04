@@ -25,20 +25,31 @@ public:
                  TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv, TcpServer &UART3_srv);
 
     /// @brief  TCP消息处理
-    /// @return 
+    /// @return
     bool onMessage(Buffer *buf);
 
     bool MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
 
-    void demoThread();
+    void URAT_demoThread();
 
-    void demoThreadHandle0();
+    void UART_releaseThread();
 
-    void demoThreadHandle1();
+private:
+    void UART0_demoThreadHandle();
 
-    void demoThreadHandle2();
+    void UART1_demoThreadHandle();
 
-    void releaseThread();
+    void UART2_demoThreadHandle();
+
+    void UART3_demoThreadHandle();
+
+    void UART4_demoThreadHandle();
+
+    void UART5_demoThreadHandle();
+
+    void UART6_demoThreadHandle();
+
+    void UART7_demoThreadHandle();
 
     void UART0_receiveThreadHandle();
 

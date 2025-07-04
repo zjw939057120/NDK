@@ -110,61 +110,100 @@ bool Verification::MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *
     return true;
 }
 
-void Verification::demoThread() {
-    //推进器demo线程
+void Verification::URAT_demoThread() {
+    //推进器、电池demo线程
     std::thread t0([this]() {
         while (true) {
-            demoThreadHandle0();
+            UART0_demoThreadHandle();
         }
     });
     t0.detach();
 
-    //电池管理demo线程
+    //控制器模块demo线程
     std::thread t1([this]() {
         while (true) {
-            demoThreadHandle1();
+            UART1_demoThreadHandle();
         }
     });
     t1.detach();
 
-    //惯导模块demo线程
+    //继电器模块demo线程
     std::thread t2([this]() {
         while (true) {
-            demoThreadHandle2();
+            UART2_demoThreadHandle();
         }
     });
     t2.detach();
+
+    //惯导模块demo线程
+    std::thread t3([this]() {
+        while (true) {
+            UART3_demoThreadHandle();
+        }
+    });
+    t3.detach();
 }
 
-void Verification::demoThreadHandle0() {
+void Verification::UART0_demoThreadHandle() {
     usleep(1000 * 200);
-    //广播推进器测试数据
+    //模块测试数据
     m_UART0_srv.broadcast(can_buf_0x200, CAN_BUFFER_LEN);
     sleep(1);
     m_UART0_srv.broadcast(can_buf_0x300, CAN_BUFFER_LEN);
     sleep(1);
     m_UART0_srv.broadcast(can_buf_0x301, CAN_BUFFER_LEN);
-}
-
-void Verification::demoThreadHandle1() {
-    usleep(1000 * 500);
-    //广播电池测试数据
+    sleep(1);
     m_UART0_srv.broadcast(can_buf_0x18FFFF01_0, CAN_BUFFER_LEN);
     sleep(1);
     m_UART0_srv.broadcast(can_buf_0x18FFFF01_1, CAN_BUFFER_LEN);
     sleep(1);
     m_UART0_srv.broadcast(can_buf_0x1806E5F4, CAN_BUFFER_LEN);
+}
+
+void Verification::UART1_demoThreadHandle() {
+    //模块测试数据
+    m_UART1_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
     sleep(1);
 }
 
-void Verification::demoThreadHandle2() {
+void Verification::UART2_demoThreadHandle() {
+    //模块测试数据
+    m_UART2_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    sleep(1);
+}
+
+void Verification::UART3_demoThreadHandle() {
     usleep(1000 * 800);
-    //广播惯导模块测试数据
-    m_UART0_srv.broadcast(imu_buf_0x05, CAN_BUFFER_LEN);
+    //模块测试数据
+    m_UART3_srv.broadcast(imu_buf_0x05, IMU_BUFFER_LEN);
     sleep(1);
 }
 
-void Verification::releaseThread() {
+void Verification::UART4_demoThreadHandle() {
+    //模块测试数据
+    m_UART0_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    sleep(1);
+}
+
+void Verification::UART5_demoThreadHandle() {
+    //模块测试数据
+    m_UART0_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    sleep(1);
+}
+
+void Verification::UART6_demoThreadHandle() {
+    //模块测试数据
+    m_UART0_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    sleep(1);
+}
+
+void Verification::UART7_demoThreadHandle() {
+    //模块测试数据
+    m_UART0_srv.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    sleep(1);
+}
+
+void Verification::UART_releaseThread() {
     //CAN模块消息线程
     if (m_serial.UART0_fd()) {
         std::thread uart0([this]() {
