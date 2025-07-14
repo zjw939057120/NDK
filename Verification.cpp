@@ -179,65 +179,65 @@ void Verification::svr_demoThread() {
 void Verification::svr0_demoThreadHandle() {
     usleep(1000 * 100);
     //模块测试数据
-    m_srv_0.broadcast(can_buf_0x200, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_0x200, sizeof(can_buf_0x200));
     sleep(1);
-    m_srv_0.broadcast(can_buf_0x300, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_0x300, sizeof(can_buf_0x300));
     sleep(1);
-    m_srv_0.broadcast(can_buf_0x301, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_0x301, sizeof(can_buf_0x301));
     sleep(1);
-    m_srv_0.broadcast(can_buf_0x18FFFF01_0, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_0x18FFFF01_0, sizeof(can_buf_0x18FFFF01_0));
     sleep(1);
-    m_srv_0.broadcast(can_buf_0x18FFFF01_1, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_0x18FFFF01_1, sizeof(can_buf_0x18FFFF01_1));
     sleep(1);
-    m_srv_0.broadcast(can_buf_0x1806E5F4, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_0x1806E5F4, sizeof(can_buf_0x1806E5F4));
     sleep(1);
 }
 
 void Verification::svr1_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 200);
-    m_srv_1.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    m_srv_1.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
 void Verification::svr2_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 300);
-    m_srv_2.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    m_srv_2.broadcast(relay_buf_0x0103, sizeof(relay_buf_0x0103));
     sleep(10);
 }
 
 void Verification::svr3_demoThreadHandle() {
     usleep(1000 * 400);
     //模块测试数据
-    m_srv_3.broadcast(imu_buf_0x05, IMU_BUFFER_LEN);
+    m_srv_3.broadcast(imu_buf_0x05, sizeof(imu_buf_0x05));
     sleep(1);
 }
 
 void Verification::svr4_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 500);
-    m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
 void Verification::svr5_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 600);
-    m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
 void Verification::svr6_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 700);
-    m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
 void Verification::svr7_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 800);
-    m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+    m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
