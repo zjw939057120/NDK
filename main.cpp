@@ -78,7 +78,10 @@ int main(int argc, char *argv[]) {
     //串口初始化
     serial.UART_init();
 
+    //实例化服务器消息处理
     Verification verification(serial, srv_0, srv_1, srv_2, srv_3);
+
+    //实例化串口消息处理
     VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
 
     UART_TcpServer(srv_0, 1880, verification,
@@ -96,6 +99,8 @@ int main(int argc, char *argv[]) {
     if (ToolKits::is_file_exists("/data/local/demo.lock")) {
         verification.svr_demoThread();
     }
+
+    //串口消息处理
     verificationReceive.UART_receiveThread();
 
     while (true) {
