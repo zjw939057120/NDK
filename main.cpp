@@ -123,10 +123,10 @@ int main(int argc, char *argv[]) {
     ToolKits::getSerialNumber();
 
     //环境初始化开始
-    if (!ToolKits::is_file_exists(TCP_SERVER_LOCK)) {
-        if (ToolKits::is_file_exists(EC20_PATH)) {
-            //存在EC20模块判定为中控系统
-            printf("the %s found\r\n", EC20_PATH);
+    if (!ToolKits::isFileExists(TCP_SERVER_LOCK)) {
+        if (ToolKits::isFileExists(UART1_PATH)) {
+            //存在串口模块判定为中控系统
+            printf("the %s found\r\n", UART1_PATH);
             //禁用娱乐屏app
             ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT_HOME);
         } else {
@@ -147,7 +147,7 @@ int main(int argc, char *argv[]) {
 
 
     //中控屏服务端应用
-    if (ToolKits::is_file_exists(EC20_PATH)) {
+    if (ToolKits::isDeviceExist(EC20_PATH)) {
     //串口初始化
     serial.UART_init();
 
@@ -178,7 +178,7 @@ int main(int argc, char *argv[]) {
     UART_TcpServer_Instance(srv_3, UART3_PORT, verification,
                    std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 
-    if (ToolKits::is_file_exists("/data/local/demo.lock")) {
+    if (ToolKits::isFileExists("/data/local/demo.lock")) {
         verification.svr_demoThread();
     }
 

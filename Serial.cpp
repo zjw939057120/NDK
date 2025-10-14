@@ -67,19 +67,19 @@ ssize_t Serial::UART_send(int &fd, const void *buf, size_t count) {
 
 void Serial::UART_init() {
     //打开CAN模块
-    if (ToolKits::is_file_exists(UART0_PATH))
+    if (ToolKits::isFileExists(UART0_PATH))
         UART0_open();
 
     //打开控制器模块
-    if (ToolKits::is_file_exists(UART1_PATH))
+    if (ToolKits::isFileExists(UART1_PATH))
         UART1_open();
 
     //打开继电器模块
-    if (ToolKits::is_file_exists(UART2_PATH))
+    if (ToolKits::isFileExists(UART2_PATH))
         UART2_open();
 
     //打开惯导模块
-    if (ToolKits::is_file_exists(UART3_PATH))
+    if (ToolKits::isFileExists(UART3_PATH))
         UART3_open();
 }
 

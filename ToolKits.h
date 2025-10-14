@@ -34,7 +34,9 @@ public:
 
     static void dump(const uint8_t *data, size_t len);
 
-    static bool is_file_exists(const std::string& filename);
+    static bool isFileExists(const std::string& filename);
+
+    static bool isDeviceExist(const std::string& devicePath);
 
     static void disablePackage(const std::string& package);
 

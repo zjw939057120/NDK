@@ -4,6 +4,7 @@
 
 #include <cstdlib>
 #include "ToolKits.h"
+#include <sys/stat.h>  // for stat()
 
 void ToolKits::GPIOInit(uint8_t GPIO) {
     char command[255];
@@ -71,8 +72,21 @@ void ToolKits::dump(const uint8_t *data, size_t len) {
     printf("\n");
 }
 
-bool ToolKits::is_file_exists(const std::string &filename) {
+bool ToolKits::isFileExists(const std::string &filename) {
     return access(filename.c_str(), F_OK) != -1;
+}
+
+bool ToolKits::isDeviceExist(const std::string &devicePath) {
+    struct stat buffer;
+    if (stat(devicePath.c_str(), &buffer) == 0) {
+        // 文件存在，可以进一步检查是否为字符设备
+        if (S_ISCHR(buffer.st_mode))
+            return true;
+        else
+            return false;
+    } else {
+        return false;
+    }
 }
 
 void ToolKits::disablePackage(const std::string &package) {
@@ -91,3 +105,4 @@ std::string ToolKits::getETH0Gateway() {
     system("chmod 755 /data/local/addition/Serial");
     return ret;
 }
+
