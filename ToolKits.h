@@ -37,6 +37,8 @@ public:
     static bool is_file_exists(const std::string& filename);
 
     static void disablePackage(const std::string& package);
+
+    static std::string getETH0Gateway() ;
 };
 
 

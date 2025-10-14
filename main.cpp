@@ -10,19 +10,19 @@
 #include <iostream>
 
 #include "hv/TcpServer.h"
+#include "hv/TcpClient.h"
+#include "hv/htime.h"
 #include "Serial.h"
 #include "Verification.h"
 #include "VerificationReceive.h"
 #include "ToolKits.h"
+#include "ClientMessageCallback.h"
 
 using namespace hv;
 
 #define TEST_TLS 0
 
-void onMessageCallback(Buffer *buf) {
-}
-
-int UART_TcpServer(TcpServer &srv, int port, Verification &verification,
+int UART_TcpServer_Instance(TcpServer &srv, int port, Verification &verification,
                    const std::function<void(Buffer *)> &onMessage) {
     hlog_set_level(LOG_LEVEL_DEBUG);
 
@@ -60,6 +60,64 @@ srv.withTLS(&ssl_opt);
     return 0;
 };
 
+int TCP_Client_Instance(int remote_port, const char *remote_host, const std::function<void(Buffer *)> &onMessage) {
+
+    TcpClient cli;
+    int connfd = cli.createsocket(remote_port, remote_host);
+    if (connfd < 0) {
+        return -20;
+    }
+    printf("client connect to port %d, connfd=%d ...\n", remote_port, connfd);
+    cli.onConnection = [&cli](const SocketChannelPtr &channel) {
+        std::string peeraddr = channel->peeraddr();
+        if (channel->isConnected()) {
+            printf("connected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
+        } else {
+            printf("disconnected to %s! connfd=%d\n", peeraddr.c_str(), channel->fd());
+        }
+        if (cli.isReconnect()) {
+            printf("reconnect cnt=%d, delay=%d\n", cli.reconn_setting->cur_retry_cnt, cli.reconn_setting->cur_delay);
+        }
+    };
+    
+    cli.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
+        onMessage(buf);
+    };
+
+#if TEST_RECONNECT
+    // reconnect: 1,2,4,8,10,10,10...
+    reconn_setting_t reconn;
+    reconn_setting_init(&reconn);
+    reconn.min_delay = 1000;
+    reconn.max_delay = 10000;
+    reconn.delay_policy = 2;
+    cli.setReconnect(&reconn);
+#endif
+
+#if TEST_TLS
+    cli.withTLS();
+#endif
+
+    cli.start();
+
+    std::string str;
+    while (std::getline(std::cin, str)) {
+        if (str == "close") {
+            cli.closesocket();
+        } else if (str == "start") {
+            cli.start();
+        } else if (str == "stop") {
+            cli.stop();
+            break;
+        } else {
+            if (!cli.isConnected()) break;
+            cli.send(str);
+        }
+    }
+
+    return 0;
+}
+
 int main(int argc, char *argv[]) {
     //记录主板唯一ID
     ToolKits::getSerialNumber();
@@ -75,7 +133,8 @@ int main(int argc, char *argv[]) {
             //禁用中控屏app
             ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT);
         }
-        fopen(TCP_SERVER_LOCK, "w");
+        FILE* fp = fopen(TCP_SERVER_LOCK, "w");
+        fclose(fp);
     }
     //环境初始化结束
 
@@ -86,6 +145,9 @@ int main(int argc, char *argv[]) {
     TcpServer srv_2;
     TcpServer srv_3;
 
+
+    //中控屏服务端应用
+    if (ToolKits::is_file_exists(EC20_PATH)) {
     //串口初始化
     serial.UART_init();
 
@@ -95,24 +157,25 @@ int main(int argc, char *argv[]) {
     //实例化串口消息处理
     VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
 
-    //系统服务
-    UART_TcpServer(svr_sys, 1870, verification,
-                   std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
+        //系统服务
+        UART_TcpServer_Instance(svr_sys, SYS_PORT, verification,
+                                std::bind(&Verification::svr_sys_onMessageCallback, &verification,
+                                          std::placeholders::_1));
 
     //串口0透传服务
-    UART_TcpServer(srv_0, 1880, verification,
+    UART_TcpServer_Instance(srv_0, UART0_PORT, verification,
                    std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
 
     //串口1透传服务
-    UART_TcpServer(srv_1, 1881, verification,
+    UART_TcpServer_Instance(srv_1, UART1_PORT, verification,
                    std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
 
     //串口2透传服务
-    UART_TcpServer(srv_2, 1882, verification,
+    UART_TcpServer_Instance(srv_2, UART2_PORT, verification,
                    std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
 
     //串口3透传服务
-    UART_TcpServer(srv_3, 1883, verification,
+    UART_TcpServer_Instance(srv_3, UART3_PORT, verification,
                    std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 
     if (ToolKits::is_file_exists("/data/local/demo.lock")) {
@@ -121,6 +184,14 @@ int main(int argc, char *argv[]) {
 
     //串口消息处理
     verificationReceive.UART_receiveThread();
+    } else {
+        //娱乐屏客户端应用
+        sleep(1);
+        std::string ip = ToolKits::getETH0Gateway();
+        printf("the eth0 gateway is %s\r\n", ip.c_str());
+        ClientMessageCallback clientMessageCallback;
+        TCP_Client_Instance(SYS_PORT, ip.c_str(),std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
+    }
 
     while (true) {
         sleep(120);

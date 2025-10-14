@@ -12,33 +12,43 @@
 #include <termios.h>
 #include <mutex>
 
+//系统服务端口
+#define SYS_PORT 1879
 //EC20模块
 #define EC20_PATH "/dev/ttyUSB2"
 #define EC20_SPEED B9600
 //CAN模块
 #define UART0_PATH "/dev/ttyCH9344USB0"
 #define UART0_SPEED B115200
+#define UART0_PORT 1880
 //控制器模块
 #define UART1_PATH "/dev/ttyCH9344USB1"
 #define UART1_SPEED B115200
+#define UART1_PORT 1881
 //继电器模块
 #define UART2_PATH "/dev/ttyCH9344USB2"
 #define UART2_SPEED B38400
+#define UART2_PORT 1882
 //惯导模块
 #define UART3_PATH "/dev/ttyCH9344USB3"
 #define UART3_SPEED B115200
+#define UART3_PORT 1883
 
 #define UART4_PATH "/dev/ttyCH9344USB4"
 #define UART4_SPEED B115200
+#define UART4_PORT 1884
 
 #define UART5_PATH "/dev/ttyCH9344USB5"
 #define UART5_SPEED B115200
+#define UART5_PORT 1885
 
 #define UART6_PATH "/dev/ttyCH9344USB6"
 #define UART6_SPEED B115200
+#define UART6_PORT 1886
 
 #define UART7_PATH "/dev/ttyCH9344USB7"
 #define UART7_SPEED B115200
+#define UART7_PORT 1887
 
 class Serial {
 

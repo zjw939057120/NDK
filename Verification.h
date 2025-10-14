@@ -2,8 +2,6 @@
 // Created by Administrator on 2025/6/10.
 //
 
-#include "Serial.h"
-
 #ifndef TCPSERVER_VERIFICATION_H
 #define TCPSERVER_VERIFICATION_H
 
@@ -11,6 +9,7 @@
 #include "Serial.h"
 
 #define TCP_SERVER_LOCK "/data/local/TcpServer.lock"
+#define DEMO_LOCK "/data/local/TcpServer.lock"
 #define PACKAGE_COM_HBTENGLV_BOAT "com.hbtenglv.boat"
 #define PACKAGE_COM_HBTENGLV_BOAT_HOME "com.hbtenglv.boathome"
 
@@ -112,12 +111,19 @@ private:
                                                   0x55, 0x54, 0x83, 0x0c, 0x43, 0x26, 0x98, 0xe7, 0x00, 0x00, 0x20
     };
 
-    enum E_SYS_MSG_ID {
-        E_SYS_MSG_ID_SETTINGS = 0,//打开设置
-        E_SYS_MSG_ID_SHUTDOWN = 1,//关机
-        E_SYS_MSG_ID_REBOOT = 2,//重启
-        E_SYS_MSG_ID_REBOOT_BOOTLOADER = 3,//重启到loader
-    };
+};
+
+//系统消息枚举
+enum E_SYS_MSG_ID {
+    E_SYS_MSG_ID_SETTINGS = 0,//打开设置
+    E_SYS_MSG_ID_SHUTDOWN = 1,//关机
+    E_SYS_MSG_ID_REBOOT = 2,//重启
+    E_SYS_MSG_ID_REBOOT_BOOTLOADER = 3,//重启到loader
+};
+
+//系统扩展消息枚举
+enum E_SYS_EXT_MSG_ID {
+    E_SYS_EXT_MSG_ID_DEMO = 0,//DEMO模式
 };
 
 #endif // TCPSERVER_VERIFICATION_H

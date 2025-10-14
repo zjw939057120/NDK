@@ -80,3 +80,14 @@ void ToolKits::disablePackage(const std::string &package) {
     sprintf(command, "pm disable-user --user 0 %s", package.c_str());
     system(command);
 }
+
+
+std::string ToolKits::getETH0Gateway() {
+    char command[255];
+    sprintf(command, "ip route show table eth0 | head -n1 | awk '{print $3}' | tr -d '\\n'");
+    std::string ret = execCommand(command);
+    sprintf(command, "echo -n %s > /data/local/addition/Gateway", ret.c_str());
+    system(command);
+    system("chmod 755 /data/local/addition/Serial");
+    return ret;
+}
