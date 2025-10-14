@@ -19,7 +19,6 @@
 
 class ToolKits {
 public:
-    static void EnvInit();
 
     static void GPIOInit(uint8_t GPIO);
 
@@ -36,6 +35,8 @@ public:
     static void dump(const uint8_t *data, size_t len);
 
     static bool is_file_exists(const std::string& filename);
+
+    static void disablePackage(const std::string& package);
 };
 
 

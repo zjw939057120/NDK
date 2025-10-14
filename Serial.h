@@ -12,7 +12,9 @@
 #include <termios.h>
 #include <mutex>
 
-
+//EC20模块
+#define EC20_PATH "/dev/ttyUSB2"
+#define EC20_SPEED B9600
 //CAN模块
 #define UART0_PATH "/dev/ttyCH9344USB0"
 #define UART0_SPEED B115200

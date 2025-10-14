@@ -10,6 +10,10 @@
 #include "hv/TcpServer.h"
 #include "Serial.h"
 
+#define TCP_SERVER_LOCK "/data/local/TcpServer.lock"
+#define PACKAGE_COM_HBTENGLV_BOAT "com.hbtenglv.boat"
+#define PACKAGE_COM_HBTENGLV_BOAT_HOME "com.hbtenglv.boathome"
+
 //CAN模块缓冲区长度
 #define CAN_BUFFER_LEN 13
 #define CAN_MSG_ID_LEN 4
@@ -24,7 +28,11 @@ using namespace hv;
 class Verification {
 public:
     Verification(Serial &serial,
-                 TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv, TcpServer &UART3_srv);
+                 TcpServer &SYS_srv, TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv, TcpServer &UART3_srv);
+
+    /// @brief  TCP消息处理
+    /// @return
+    void svr_sys_onMessageCallback(Buffer *buf);
 
     /// @brief  TCP消息处理
     /// @return
@@ -42,7 +50,9 @@ public:
     /// @return
     void svr3_onMessageCallback(Buffer *buf);
 
-    void MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+    void Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    void Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
 
     void svr_demoThread();
 
@@ -65,6 +75,7 @@ private:
 
 private:
     Serial &m_serial;
+    TcpServer &m_srv_sys;
     TcpServer &m_srv_0;
     TcpServer &m_srv_1;
     TcpServer &m_srv_2;
@@ -99,6 +110,13 @@ private:
                                                   0x55, 0x52, 0xe5, 0xff, 0x3e, 0x00, 0x00, 0x00, 0x8b, 0x0b, 0x5f,
                                                   0x55, 0x53, 0xf8, 0x00, 0x84, 0xfe, 0x6e, 0x0a, 0xfb, 0x46, 0xde,
                                                   0x55, 0x54, 0x83, 0x0c, 0x43, 0x26, 0x98, 0xe7, 0x00, 0x00, 0x20
+    };
+
+    enum E_SYS_MSG_ID {
+        E_SYS_MSG_ID_SETTINGS = 0,//打开设置
+        E_SYS_MSG_ID_SHUTDOWN = 1,//关机
+        E_SYS_MSG_ID_REBOOT = 2,//重启
+        E_SYS_MSG_ID_REBOOT_BOOTLOADER = 3,//重启到loader
     };
 };
 

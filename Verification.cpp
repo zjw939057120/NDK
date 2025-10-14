@@ -6,46 +6,62 @@
 #include "Verification.h"
 #include "ToolKits.h"
 
-Verification::Verification(Serial &serial, TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv,
+Verification::Verification(Serial &serial,
+                           TcpServer &SYS_srv, TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv,
                            TcpServer &UART3_srv)
         : m_serial(serial),
-          m_srv_0(UART0_srv), m_srv_1(UART1_srv), m_srv_2(UART2_srv), m_srv_3(UART3_srv) {
+          m_srv_sys(SYS_srv), m_srv_0(UART0_srv), m_srv_1(UART1_srv), m_srv_2(UART2_srv), m_srv_3(UART3_srv) {
 
 }
 
-void Verification::svr0_onMessageCallback(Buffer *buf) {
+void Verification::svr_sys_onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //系统消息,校验数据长度
     ToolKits::dump(buffer, size);
     if (size < CAN_BUFFER_LEN) {
-        m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+        m_srv_sys.broadcast(can_buf_empty, CAN_BUFFER_LEN);
         return;
     }
 
     //消息类型
     uint8_t msgType = buffer[0];
+    uint32_t msgId_tmp = 0;
+    memcpy(&msgId_tmp, &buffer[1], CAN_MSG_ID_LEN);
+    //消息ID
+    uint32_t msgId = ntohl(msgId_tmp); // 大端序转小端序、
+    //消息
+    uint8_t msgBody[8];
+    memcpy(&msgBody, &buffer[5], CAN_MSG_BODY_LEN);
+    printf("msgType:0x%02x,msgId:0x%02x\n", msgType, msgId);
+
     switch (msgType) {
+        case 0x00://系统消息
+        {
+            Sys_MsgType_0x00(buffer, msgId, msgBody);
+            break;
+        }
         case 0x01://系统消息
         {
-            uint32_t tmp = 0;
-            memcpy(&tmp, &buffer[1], CAN_MSG_ID_LEN);
-            //消息ID
-            uint32_t msgId = ntohl(tmp); // 大端序转小端序、
-            //消息
-            uint8_t msgBody[8];
-            memcpy(&msgBody, &buffer[5], CAN_MSG_BODY_LEN);
-            printf("msgType:0x%02x,msgId:0x%02x\n", msgType, msgId);
-            MsgType_0x01(buffer, msgId, msgBody);
+            Sys_MsgType_0x01(buffer, msgId, msgBody);
+            break;
         }
-            break;
-        case 0x08://CAN标准帧
-        case 0x88://CAN扩展帧
-            m_serial.UART0_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
-            break;
         default:
+            m_srv_sys.broadcast(can_buf_empty, CAN_BUFFER_LEN);
             break;
     }
+}
+
+void Verification::svr0_onMessageCallback(Buffer *buf) {
+    size_t size = buf->size();
+    auto *buffer = static_cast<uint8_t *>(buf->data());
+    //CAN消息,校验数据长度
+    ToolKits::dump(buffer, size);
+//    if (size < CAN_BUFFER_LEN) {
+//        m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+//        return;
+//    }
+    m_serial.UART0_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
 }
 
 void Verification::svr1_onMessageCallback(Buffer *buf) {
@@ -84,62 +100,36 @@ void Verification::svr3_onMessageCallback(Buffer *buf) {
     m_serial.UART3_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
-void Verification::MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
-    switch (msgId) {
-        case 0x00:
-            //预留
+void Verification::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    std::system("sync &");
+    switch ((E_SYS_MSG_ID) msgId) {
+        case E_SYS_MSG_ID_SETTINGS: {
+            std::system("am start -a android.settings.SETTINGS &");
+            m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
             break;
-        case 0x01: {
-            //写入继电器状态
-            msgBody[0] == 1 ? ToolKits::GPIOSetHigh(SWITCH_1) : ToolKits::GPIOSetLow(SWITCH_1);
-            msgBody[1] == 1 ? ToolKits::GPIOSetHigh(SWITCH_2) : ToolKits::GPIOSetLow(SWITCH_2);
-            msgBody[2] == 1 ? ToolKits::GPIOSetHigh(SWITCH_3) : ToolKits::GPIOSetLow(SWITCH_3);
-            msgBody[3] == 1 ? ToolKits::GPIOSetHigh(SWITCH_4) : ToolKits::GPIOSetLow(SWITCH_4);
-            msgBody[4] == 1 ? ToolKits::GPIOSetHigh(SWITCH_5) : ToolKits::GPIOSetLow(SWITCH_5);
-            msgBody[5] == 1 ? ToolKits::GPIOSetHigh(SWITCH_6) : ToolKits::GPIOSetLow(SWITCH_6);
-
-            //读取继电器状态
-            uint8_t body[CAN_MSG_BODY_LEN] = {0};
-            uint8_t index = 0;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_1);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_2);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_3);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_4);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_5);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_6);
-            memcpy(&buffer[CAN_MSG_ID_LEN + 1], body, CAN_MSG_BODY_LEN);
-            m_srv_0.broadcast(buffer, CAN_BUFFER_LEN);
-
         }
+        case E_SYS_MSG_ID_SHUTDOWN: {
+            std::system("svc power shutdown &");
+            m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
             break;
-        case 0x02: {
-            //读取继电器状态
-            uint8_t body[CAN_MSG_BODY_LEN] = {0};
-            uint8_t index = 0;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_1);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_2);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_3);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_4);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_5);
-            index++;
-            body[index] = ToolKits::GPIOGetValue(SWITCH_6);
-            memcpy(&buffer[CAN_MSG_ID_LEN + 1], body, CAN_MSG_BODY_LEN);
-            m_srv_0.broadcast(buffer, CAN_BUFFER_LEN);
-
         }
+        case E_SYS_MSG_ID_REBOOT: {
+            std::system("svc power reboot &");
+            m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
             break;
+        }
+        case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
+            std::system("svc power reboot loader &");
+            m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+            break;
+        }
         default:
             break;
     }
+}
+
+void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody){
+    std::system("sync &");
 }
 
 void Verification::svr_demoThread() {

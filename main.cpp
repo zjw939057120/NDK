@@ -61,38 +61,57 @@ srv.withTLS(&ssl_opt);
 };
 
 int main(int argc, char *argv[]) {
-    /*
-    if (!ToolKits::is_file_exists(UART0_PATH)) {
-        printf("the %s not found, exit\r\n", UART0_PATH);
-        return 0;//仅主系统存在CH344/CH348串口模块
-    }*/
-    Serial serial;
+    //记录主板唯一ID
+    ToolKits::getSerialNumber();
 
+    //环境初始化开始
+    if (!ToolKits::is_file_exists(TCP_SERVER_LOCK)) {
+        if (ToolKits::is_file_exists(EC20_PATH)) {
+            //存在EC20模块判定为中控系统
+            printf("the %s found\r\n", EC20_PATH);
+            //禁用娱乐屏app
+            ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT_HOME);
+        } else {
+            //禁用中控屏app
+            ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT);
+        }
+        fopen(TCP_SERVER_LOCK, "w");
+    }
+    //环境初始化结束
+
+    Serial serial;
+    TcpServer svr_sys;
     TcpServer srv_0;
     TcpServer srv_1;
     TcpServer srv_2;
     TcpServer srv_3;
 
-    //环境初始化
-    ToolKits::EnvInit();
     //串口初始化
     serial.UART_init();
 
     //实例化服务器消息处理
-    Verification verification(serial, srv_0, srv_1, srv_2, srv_3);
+    Verification verification(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
 
     //实例化串口消息处理
     VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
 
+    //系统服务
+    UART_TcpServer(svr_sys, 1870, verification,
+                   std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
+
+    //串口0透传服务
     UART_TcpServer(srv_0, 1880, verification,
                    std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
 
+    //串口1透传服务
     UART_TcpServer(srv_1, 1881, verification,
                    std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
 
+    //串口2透传服务
     UART_TcpServer(srv_2, 1882, verification,
                    std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
 
+    //串口3透传服务
     UART_TcpServer(srv_3, 1883, verification,
                    std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 

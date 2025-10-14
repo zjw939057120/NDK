@@ -5,17 +5,6 @@
 #include <cstdlib>
 #include "ToolKits.h"
 
-void ToolKits::EnvInit() {
-    getSerialNumber();
-
-    GPIOInit(SWITCH_1);
-    GPIOInit(SWITCH_2);
-    GPIOInit(SWITCH_3);
-    GPIOInit(SWITCH_4);
-    GPIOInit(SWITCH_5);
-    GPIOInit(SWITCH_6);
-}
-
 void ToolKits::GPIOInit(uint8_t GPIO) {
     char command[255];
     sprintf(command, "echo %d > /sys/class/gpio/export", GPIO);
@@ -84,4 +73,10 @@ void ToolKits::dump(const uint8_t *data, size_t len) {
 
 bool ToolKits::is_file_exists(const std::string &filename) {
     return access(filename.c_str(), F_OK) != -1;
+}
+
+void ToolKits::disablePackage(const std::string &package) {
+    char command[255];
+    sprintf(command, "pm disable-user --user 0 %s", package.c_str());
+    system(command);
 }

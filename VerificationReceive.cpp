@@ -64,7 +64,7 @@ void VerificationReceive::UART0_receiveThreadHandle() {
         len = m_serial.UART0_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        else if (len == 13 && buffer[0] == 0x88 && buffer[1] == 0x18 && buffer[2] == 0xFF && buffer[3] == 0xFF &&
+        else if (len == CAN_BUFFER_LEN && buffer[1] == 0x18 && buffer[2] == 0xFF && buffer[3] == 0xFF &&
                  buffer[4] == 0x01 && buffer[5] == 0x01)
             //过滤电池故障CAN扩展帧0x88, 0x18, 0xFF, 0xFF, 0x01, 0x01
             continue;
