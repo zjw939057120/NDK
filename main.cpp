@@ -158,9 +158,8 @@ int main(int argc, char *argv[]) {
     VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
 
         //系统服务
-        UART_TcpServer_Instance(svr_sys, SYS_PORT, verification,
-                                std::bind(&Verification::svr_sys_onMessageCallback, &verification,
-                                          std::placeholders::_1));
+    UART_TcpServer_Instance(svr_sys, SYS_PORT, verification,
+                   std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
 
     //串口0透传服务
     UART_TcpServer_Instance(srv_0, UART0_PORT, verification,
@@ -186,7 +185,7 @@ int main(int argc, char *argv[]) {
     verificationReceive.UART_receiveThread();
     } else {
         //娱乐屏客户端应用
-        sleep(1);
+        sleep(3);
         std::string ip = ToolKits::getETH0Gateway();
         printf("the eth0 gateway is %s\r\n", ip.c_str());
         ClientMessageCallback clientMessageCallback;
@@ -194,7 +193,7 @@ int main(int argc, char *argv[]) {
     }
 
     while (true) {
-        sleep(120);
+        sleep(300);
     }
     return 0;
 }
