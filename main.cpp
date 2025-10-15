@@ -133,7 +133,7 @@ int main(int argc, char *argv[]) {
             //禁用中控屏app
             ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT);
         }
-        FILE* fp = fopen(TCP_SERVER_LOCK, "w");
+        FILE *fp = fopen(TCP_SERVER_LOCK, "w");
         fclose(fp);
     }
     //环境初始化结束

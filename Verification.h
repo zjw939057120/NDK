@@ -123,7 +123,8 @@ enum E_SYS_MSG_ID {
 
 //系统扩展消息枚举
 enum E_SYS_EXT_MSG_ID {
-    E_SYS_EXT_MSG_ID_DEMO = 0,//DEMO模式
+    E_SYS_EXT_MSG_ID_DEMO = 0,//进入DEMO模式
+    E_SYS_EXT_MSG_ID_DEMO_EXIT = 1,//退出DEMO模式
 };
 
 #endif // TCPSERVER_VERIFICATION_H
