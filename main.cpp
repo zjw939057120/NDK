@@ -20,12 +20,11 @@
 
 using namespace hv;
 
+#define TEST_RECONNECT  1
 #define TEST_TLS 0
 
 int UART_TcpServer_Instance(TcpServer &srv, int port, Verification &verification,
                    const std::function<void(Buffer *)> &onMessage) {
-    hlog_set_level(LOG_LEVEL_DEBUG);
-
     int listenfd = srv.createsocket(port);
     if (listenfd < 0) {
         return -20;
@@ -139,11 +138,14 @@ void init() {
 };
 
 int main(int argc, char *argv[]) {
+    hlog_set_level(LOG_LEVEL_DEBUG);
     // 将 stdout 重定向到文件
-    if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
-        perror("freopen stdout failed");
-    }
-
+//    if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
+//        perror("freopen stdout failed");
+//    }
+//    if (freopen(TCP_SERVER_LOG, "w", stderr) == nullptr) {
+//        perror("freopen stdout failed");
+//    }
     //记录主板唯一ID
     ToolKits::getSerialNumber();
 
@@ -199,15 +201,15 @@ int main(int argc, char *argv[]) {
     } else {
         //娱乐屏客户端应用
         std::string ip = ToolKits::getGateway();
-//        while (ip.empty()) {
-//            sleep(5);
-//            ip = ToolKits::getGateway();
-//        }
-        ip = "192.168.3.173";
+        while (ip.empty()) {
+            sleep(5);
+            ip = ToolKits::getGateway();
+        }
         printf("the eth0 gateway is %s\r\n", ip.c_str());
         ClientMessageCallback clientMessageCallback;
         TCP_Client_Instance(SYS_PORT, ip.c_str(),
                             std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
+
     }
 
     while (true) {

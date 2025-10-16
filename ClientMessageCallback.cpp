@@ -75,13 +75,13 @@ void ClientMessageCallback::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, co
             //创建demo标识并重启系统
             FILE *fp = fopen(DEMO_LOCK, "w");
             fclose(fp);
-            std::system("svc power reboot &");
+            std::system("svc power reboot");
             break;
         }
         case E_SYS_EXT_MSG_ID_DEMO_EXIT: {
             //删除demo标识并重启系统
             unlink(DEMO_LOCK);
-            std::system("svc power reboot &");
+            std::system("svc power reboot");
             break;
         }
         default:
