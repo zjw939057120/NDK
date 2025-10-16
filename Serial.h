@@ -179,14 +179,14 @@ private:
 
 private:
     /// @brief 串口文件描述符，打开后用于读写操作
-    int uart0_fd = -1;
-    int uart1_fd = -1;
-    int uart2_fd = -1;
-    int uart3_fd = -1;
-    int uart4_fd = -1;
-    int uart5_fd = -1;
-    int uart6_fd = -1;
-    int uart7_fd = -1;
+    int uart0_fd = 0;
+    int uart1_fd = 0;
+    int uart2_fd = 0;
+    int uart3_fd = 0;
+    int uart4_fd = 0;
+    int uart5_fd = 0;
+    int uart6_fd = 0;
+    int uart7_fd = 0;
 
     std::mutex uart0_mutex;
     std::mutex uart1_mutex;

@@ -40,7 +40,7 @@ public:
 
     static void disablePackage(const std::string& package);
 
-    static std::string getETH0Gateway() ;
+    static std::string getGateway() ;
 };
 
 

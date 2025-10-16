@@ -36,6 +36,7 @@ uint8_t ToolKits::GPIOGetValue(uint8_t GPIO) {
 
 std::string ToolKits::execCommand(const char *cmd) {
     char buffer[512];
+    std::string result;
     FILE *pipe = popen(cmd, "r"); // 将"ls -l"替换为你想要执行的命令
 
     if (!pipe) {
@@ -44,6 +45,7 @@ std::string ToolKits::execCommand(const char *cmd) {
     }
 
     while (fgets(buffer, sizeof(buffer), pipe) != NULL) {
+        result += buffer;
         //printf("%s", buffer);
     }
 
@@ -52,7 +54,7 @@ std::string ToolKits::execCommand(const char *cmd) {
         return "";
     }
 
-    return buffer;
+    return result;
 }
 
 std::string ToolKits::getSerialNumber() {
@@ -96,13 +98,15 @@ void ToolKits::disablePackage(const std::string &package) {
 }
 
 
-std::string ToolKits::getETH0Gateway() {
+std::string ToolKits::getGateway() {
     char command[255];
     sprintf(command, "ip route show table eth0 | head -n1 | awk '{print $3}' | tr -d '\\n'");
     std::string ret = execCommand(command);
-    sprintf(command, "echo -n %s > /data/local/addition/Gateway", ret.c_str());
-    system(command);
-    system("chmod 755 /data/local/addition/Serial");
+    if (!ret.empty()) {
+        sprintf(command, "echo -n %s > /data/local/addition/Gateway", ret.c_str());
+        system(command);
+        system("chmod 755 /data/local/addition/Gateway");
+    }
     return ret;
 }
 

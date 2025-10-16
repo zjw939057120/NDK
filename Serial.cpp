@@ -58,20 +58,11 @@ int Serial::UART_setAttribs(int &fd, int speed) {
 }
 
 ssize_t Serial::UART_receive(int &fd, void *buf, size_t count) {
-    if (fd > 0) {
-        return read(fd, buf, count); // 读取数据
-    } else {
-        sleep(3);
-        return 0;
-    }
+    return read(fd, buf, count); // 读取数据
 }
 
 ssize_t Serial::UART_send(int &fd, const void *buf, size_t count) {
-    if (fd > 0) {
-        return fd > 0 ? write(fd, buf, count) : 0;// 写入数据
-    } else {
-        return 0;
-    }
+    return write(fd, buf, count); // 写入数据
 }
 
 void Serial::UART_init() {

@@ -118,25 +118,32 @@ int TCP_Client_Instance(int remote_port, const char *remote_host, const std::fun
     return 0;
 }
 
+void init() {
+    if (ToolKits::isFileExists(TCP_SERVER_LOCK))
+        return;
+
+    //取消通知提示音
+    std::system("settings put system notification_sound null");
+    //存在串口模块判定为中控系统
+    if (ToolKits::isFileExists(UART1_PATH)) {
+        printf("the %s found\r\n", UART1_PATH);
+        //禁用娱乐屏app
+        ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT_HOME);
+    } else {
+        //禁用中控屏app
+        ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT);
+    }
+
+    FILE *fp = fopen(TCP_SERVER_LOCK, "w");
+    fclose(fp);
+};
+
 int main(int argc, char *argv[]) {
     //记录主板唯一ID
     ToolKits::getSerialNumber();
 
-    //环境初始化开始
-    if (!ToolKits::isFileExists(TCP_SERVER_LOCK)) {
-        if (ToolKits::isFileExists(UART1_PATH)) {
-            //存在串口模块判定为中控系统
-            printf("the %s found\r\n", UART1_PATH);
-            //禁用娱乐屏app
-            ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT_HOME);
-        } else {
-            //禁用中控屏app
-            ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT);
-        }
-        FILE *fp = fopen(TCP_SERVER_LOCK, "w");
-        fclose(fp);
-    }
-    //环境初始化结束
+    //环境初始化
+    init();
 
     Serial serial;
     TcpServer svr_sys;
@@ -148,48 +155,53 @@ int main(int argc, char *argv[]) {
 
     //中控屏服务端应用
     if (ToolKits::isDeviceExist(EC20_PATH)) {
-    //串口初始化
-    serial.UART_init();
+        //串口初始化
+        serial.UART_init();
 
-    //实例化服务器消息处理
-    Verification verification(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
+        //实例化服务器消息处理
+        Verification verification(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
 
-    //实例化串口消息处理
-    VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
+        //实例化串口消息处理
+        VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
 
         //系统服务
-    UART_TcpServer_Instance(svr_sys, SYS_PORT, verification,
-                   std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
+        UART_TcpServer_Instance(svr_sys, SYS_PORT, verification,
+                                std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
 
-    //串口0透传服务
-    UART_TcpServer_Instance(srv_0, UART0_PORT, verification,
-                   std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
+        //串口0透传服务
+        UART_TcpServer_Instance(srv_0, UART0_PORT, verification,
+                                std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
 
-    //串口1透传服务
-    UART_TcpServer_Instance(srv_1, UART1_PORT, verification,
-                   std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
+        //串口1透传服务
+        UART_TcpServer_Instance(srv_1, UART1_PORT, verification,
+                                std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
 
-    //串口2透传服务
-    UART_TcpServer_Instance(srv_2, UART2_PORT, verification,
-                   std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
+        //串口2透传服务
+        UART_TcpServer_Instance(srv_2, UART2_PORT, verification,
+                                std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
 
-    //串口3透传服务
-    UART_TcpServer_Instance(srv_3, UART3_PORT, verification,
-                   std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
+        //串口3透传服务
+        UART_TcpServer_Instance(srv_3, UART3_PORT, verification,
+                                std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 
-    if (ToolKits::isFileExists("/data/local/demo.lock")) {
-        verification.svr_demoThread();
-    }
+        if (ToolKits::isFileExists("/data/local/demo.lock")) {
+            verification.svr_demoThread();
+        }
 
-    //串口消息处理
-    verificationReceive.UART_receiveThread();
+        //串口消息处理
+        verificationReceive.UART_receiveThread();
+
     } else {
         //娱乐屏客户端应用
-        sleep(3);
-        std::string ip = ToolKits::getETH0Gateway();
+        std::string ip = ToolKits::getGateway();
+        while (ip.empty()) {
+            sleep(5);
+            ip = ToolKits::getGateway();
+        }
         printf("the eth0 gateway is %s\r\n", ip.c_str());
         ClientMessageCallback clientMessageCallback;
-        TCP_Client_Instance(SYS_PORT, ip.c_str(),std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
+        TCP_Client_Instance(SYS_PORT, ip.c_str(),
+                            std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
     }
 
     while (true) {
