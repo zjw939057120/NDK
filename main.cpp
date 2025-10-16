@@ -60,7 +60,6 @@ srv.withTLS(&ssl_opt);
 };
 
 int TCP_Client_Instance(int remote_port, const char *remote_host, const std::function<void(Buffer *)> &onMessage) {
-
     TcpClient cli;
     int connfd = cli.createsocket(remote_port, remote_host);
     if (connfd < 0) {
@@ -78,7 +77,7 @@ int TCP_Client_Instance(int remote_port, const char *remote_host, const std::fun
             printf("reconnect cnt=%d, delay=%d\n", cli.reconn_setting->cur_retry_cnt, cli.reconn_setting->cur_delay);
         }
     };
-    
+
     cli.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
         onMessage(buf);
     };
@@ -99,21 +98,10 @@ int TCP_Client_Instance(int remote_port, const char *remote_host, const std::fun
 
     cli.start();
 
-    std::string str;
-    while (std::getline(std::cin, str)) {
-        if (str == "close") {
-            cli.closesocket();
-        } else if (str == "start") {
-            cli.start();
-        } else if (str == "stop") {
-            cli.stop();
-            break;
-        } else {
-            if (!cli.isConnected()) break;
-            cli.send(str);
-        }
+    //必须在内部才能阻止客户端退出
+    while (true){
+        sleep(300);
     }
-
     return 0;
 }
 
@@ -140,12 +128,12 @@ void init() {
 int main(int argc, char *argv[]) {
     hlog_set_level(LOG_LEVEL_DEBUG);
     // 将 stdout 重定向到文件
-//    if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
-//        perror("freopen stdout failed");
-//    }
-//    if (freopen(TCP_SERVER_LOG, "w", stderr) == nullptr) {
-//        perror("freopen stdout failed");
-//    }
+    if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
+        perror("freopen stdout failed");
+    }
+    if (freopen(TCP_SERVER_LOG, "w", stderr) == nullptr) {
+        perror("freopen stdout failed");
+    }
     //记录主板唯一ID
     ToolKits::getSerialNumber();
 
@@ -198,6 +186,22 @@ int main(int argc, char *argv[]) {
         //串口消息处理
         verificationReceive.UART_receiveThread();
 
+        while (true) {
+            if (!ToolKits::isDeviceExist(UART0_PATH)) {
+                serial.UART0_close();
+                serial.UART1_close();
+                serial.UART2_close();
+                serial.UART3_close();
+                serial.UART4_close();
+                serial.UART5_close();
+                serial.UART6_close();
+                serial.UART7_close();
+            }
+            sleep(60);
+        }
+
+
+
     } else {
         //娱乐屏客户端应用
         std::string ip = ToolKits::getGateway();
@@ -210,20 +214,6 @@ int main(int argc, char *argv[]) {
         TCP_Client_Instance(SYS_PORT, ip.c_str(),
                             std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
 
-    }
-
-    while (true) {
-        if (!ToolKits::isDeviceExist(UART0_PATH)) {
-            serial.UART0_close();
-            serial.UART1_close();
-            serial.UART2_close();
-            serial.UART3_close();
-            serial.UART4_close();
-            serial.UART5_close();
-            serial.UART6_close();
-            serial.UART7_close();
-        }
-        sleep(60);
     }
     return 0;
 }
