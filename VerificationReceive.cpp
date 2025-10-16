@@ -16,41 +16,33 @@ VerificationReceive::VerificationReceive(Serial &serial, TcpServer &UART0_srv, T
 
 void VerificationReceive::UART_receiveThread() {
     //CAN模块消息线程
-    if (m_serial.UART0_fd()) {
+    if (m_serial.uart0_fd) {
         std::thread uart0([this]() {
-            while (true) {
-                UART0_receiveThreadHandle();
-            }
+            UART0_receiveThreadHandle();
         });
         uart0.detach();
     }
 
     //控制器模块消息线程
-    if (m_serial.UART1_fd()) {
+    if (m_serial.uart1_fd) {
         std::thread uart1([this]() {
-            while (true) {
-                UART1_receiveThreadHandle();
-            }
+            UART1_receiveThreadHandle();
         });
         uart1.detach();
     }
 
     //继电器模块消息线程
-    if (m_serial.UART2_fd()) {
+    if (m_serial.uart2_fd) {
         std::thread uart2([this]() {
-            while (true) {
-                UART2_receiveThreadHandle();
-            }
+            UART2_receiveThreadHandle();
         });
         uart2.detach();
     }
 
     //惯导模块消息线程
-    if (m_serial.UART3_fd()) {
+    if (m_serial.uart3_fd) {
         std::thread uart3([this]() {
-            while (true) {
-                UART3_receiveThreadHandle();
-            }
+            UART3_receiveThreadHandle();
         });
         uart3.detach();
     }
@@ -60,7 +52,7 @@ void VerificationReceive::UART_receiveThread() {
 void VerificationReceive::UART0_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN模块串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart0_fd) {
         len = m_serial.UART0_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -77,7 +69,7 @@ void VerificationReceive::UART0_receiveThreadHandle() {
 void VerificationReceive::UART1_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取控制器模块串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart1_fd) {
         len = m_serial.UART1_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -90,7 +82,7 @@ void VerificationReceive::UART1_receiveThreadHandle() {
 void VerificationReceive::UART2_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取继电器串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart2_fd) {
         len = m_serial.UART2_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -103,7 +95,7 @@ void VerificationReceive::UART2_receiveThreadHandle() {
 void VerificationReceive::UART3_receiveThreadHandle() {
     uint8_t buffer[IMU_BUFFER_LEN]; // 读取惯串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart3_fd) {
         len = m_serial.UART3_receive(buffer, IMU_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -116,7 +108,7 @@ void VerificationReceive::UART3_receiveThreadHandle() {
 void VerificationReceive::UART4_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart4_fd) {
         len = m_serial.UART4_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -129,7 +121,7 @@ void VerificationReceive::UART4_receiveThreadHandle() {
 void VerificationReceive::UART5_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart5_fd) {
         len = m_serial.UART5_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -142,7 +134,7 @@ void VerificationReceive::UART5_receiveThreadHandle() {
 void VerificationReceive::UART6_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart7_fd) {
         len = m_serial.UART6_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
@@ -155,7 +147,7 @@ void VerificationReceive::UART6_receiveThreadHandle() {
 void VerificationReceive::UART7_receiveThreadHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
-    while (true) {
+    while (m_serial.uart7_fd) {
         len = m_serial.UART7_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;

@@ -106,19 +106,31 @@ void Verification::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8
 
     switch ((E_SYS_MSG_ID) msgId) {
         case E_SYS_MSG_ID_SETTINGS: {
-            std::system("am start -a android.settings.SETTINGS &");
+            std::system("am start -a android.settings.SETTINGS");
             break;
         }
         case E_SYS_MSG_ID_SHUTDOWN: {
-            std::system("svc power shutdown &");
+            std::thread t([]() {
+                sleep(1);
+                std::system("svc power shutdown");
+            });
+            t.detach();
             break;
         }
         case E_SYS_MSG_ID_REBOOT: {
-            std::system("svc power reboot &");
+            std::thread t([]() {
+                sleep(1);
+                std::system("svc power reboot");
+            });
+            t.detach();
             break;
         }
         case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
-            std::system("svc power reboot loader &");
+            std::thread t([]() {
+                sleep(1);
+                std::system("svc power reboot loader");
+            });
+            t.detach();
             break;
         }
         default:
@@ -126,7 +138,7 @@ void Verification::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8
     }
 }
 
-void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody){
+void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 
@@ -135,13 +147,21 @@ void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8
             //创建demo标识并重启系统
             FILE *fp = fopen(DEMO_LOCK, "w");
             fclose(fp);
-            std::system("svc power reboot &");
+            std::thread t([]() {
+                sleep(1);
+                std::system("svc power reboot");
+            });
+            t.detach();
             break;
         }
         case E_SYS_EXT_MSG_ID_DEMO_EXIT: {
             //删除demo标识并重启系统
             unlink(DEMO_LOCK);
-            std::system("svc power reboot &");
+            std::thread t([]() {
+                sleep(1);
+                std::system("svc power reboot");
+            });
+            t.detach();
             break;
         }
         default:

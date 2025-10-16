@@ -139,6 +139,11 @@ void init() {
 };
 
 int main(int argc, char *argv[]) {
+    // 将 stdout 重定向到文件
+    if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
+        perror("freopen stdout failed");
+    }
+
     //记录主板唯一ID
     ToolKits::getSerialNumber();
 
@@ -184,7 +189,7 @@ int main(int argc, char *argv[]) {
         UART_TcpServer_Instance(srv_3, UART3_PORT, verification,
                                 std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 
-        if (ToolKits::isFileExists("/data/local/demo.lock")) {
+        if (ToolKits::isFileExists(DEMO_LOCK)) {
             verification.svr_demoThread();
         }
 
@@ -194,10 +199,11 @@ int main(int argc, char *argv[]) {
     } else {
         //娱乐屏客户端应用
         std::string ip = ToolKits::getGateway();
-        while (ip.empty()) {
-            sleep(5);
-            ip = ToolKits::getGateway();
-        }
+//        while (ip.empty()) {
+//            sleep(5);
+//            ip = ToolKits::getGateway();
+//        }
+        ip = "192.168.3.173";
         printf("the eth0 gateway is %s\r\n", ip.c_str());
         ClientMessageCallback clientMessageCallback;
         TCP_Client_Instance(SYS_PORT, ip.c_str(),
@@ -205,7 +211,17 @@ int main(int argc, char *argv[]) {
     }
 
     while (true) {
-        sleep(300);
+        if (!ToolKits::isDeviceExist(UART0_PATH)) {
+            serial.UART0_close();
+            serial.UART1_close();
+            serial.UART2_close();
+            serial.UART3_close();
+            serial.UART4_close();
+            serial.UART5_close();
+            serial.UART6_close();
+            serial.UART7_close();
+        }
+        sleep(60);
     }
     return 0;
 }

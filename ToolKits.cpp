@@ -61,7 +61,10 @@ std::string ToolKits::getSerialNumber() {
     char command[255];
     sprintf(command, "grep \"Serial\" /proc/cpuinfo  | cut -d':' -f2 | xargs | tr -d '\\n'");
     std::string ret = execCommand(command);
+    printf("the Serial is %s\r\n", ret.c_str());
     sprintf(command, "echo -n %s > /data/local/addition/Serial", ret.c_str());
+    system(command);
+    sprintf(command, "id > /data/local/addition/id");
     system(command);
     system("chmod 755 /data/local/addition/Serial");
     return ret;

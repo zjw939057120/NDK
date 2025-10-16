@@ -8,8 +8,9 @@
 #include "hv/TcpServer.h"
 #include "Serial.h"
 
-#define TCP_SERVER_LOCK "/data/local/TcpServer.lock"
-#define DEMO_LOCK "/data/local/TcpServer.lock"
+#define TCP_SERVER_LOCK "/data/local/addition/TcpServer.lock"
+#define TCP_SERVER_LOG "/data/local/addition/TcpServer.log"
+#define DEMO_LOCK "/data/local/addition/demo.lock"
 #define PACKAGE_COM_HBTENGLV_BOAT "com.hbtenglv.boat"
 #define PACKAGE_COM_HBTENGLV_BOAT_HOME "com.hbtenglv.boathome"
 

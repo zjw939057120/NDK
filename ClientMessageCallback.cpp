@@ -47,19 +47,19 @@ void ClientMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
 
     switch ((E_SYS_MSG_ID) msgId) {
         case E_SYS_MSG_ID_SETTINGS: {
-            std::system("am start -a android.settings.SETTINGS &");
+            std::system("am start -a android.settings.SETTINGS");
             break;
         }
         case E_SYS_MSG_ID_SHUTDOWN: {
-            std::system("svc power shutdown &");
+            std::system("svc power shutdown");
             break;
         }
         case E_SYS_MSG_ID_REBOOT: {
-            std::system("svc power reboot &");
+            std::system("svc power reboot");
             break;
         }
         case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
-            std::system("svc power reboot loader &");
+            std::system("svc power reboot loader");
             break;
         }
         default:
