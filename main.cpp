@@ -1,30 +1,6 @@
-/*
- * TcpServer_test.cpp
- *
- * @build   make evpp
- * @server  bin/TcpServer_test 1234
- * @client  bin/TcpClient_test 1234
- *
- */
+#include "main.h"
 
-#include <iostream>
-
-#include "hv/TcpServer.h"
-#include "hv/TcpClient.h"
-#include "hv/htime.h"
-#include "Serial.h"
-#include "Verification.h"
-#include "VerificationReceive.h"
-#include "ToolKits.h"
-#include "ClientMessageCallback.h"
-
-using namespace hv;
-
-#define TEST_RECONNECT  1
-#define TEST_TLS 0
-
-int UART_TcpServer_Instance(TcpServer &srv, int port, Verification &verification,
-                   const std::function<void(Buffer *)> &onMessage) {
+int UART_TcpServer_Instance(TcpServer &srv, int port, const std::function<void(Buffer *)> &onMessage) {
     int listenfd = srv.createsocket(port);
     if (listenfd < 0) {
         return -20;
@@ -40,7 +16,7 @@ int UART_TcpServer_Instance(TcpServer &srv, int port, Verification &verification
                    currentThreadEventLoop->tid());
         }
     };
-    srv.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
+    srv.onMessage = [&onMessage](const SocketChannelPtr &channel, Buffer *buf) {
         onMessage(buf);
     };
     srv.setThreadNum(4);
@@ -59,8 +35,7 @@ srv.withTLS(&ssl_opt);
     return 0;
 };
 
-int TCP_Client_Instance(int remote_port, const char *remote_host, const std::function<void(Buffer *)> &onMessage) {
-    TcpClient cli;
+int TCP_Client_Instance(TcpClient &cli, int remote_port, const char *remote_host, const std::function<void(Buffer *)> &onMessage) {
     int connfd = cli.createsocket(remote_port, remote_host);
     if (connfd < 0) {
         return -20;
@@ -78,7 +53,7 @@ int TCP_Client_Instance(int remote_port, const char *remote_host, const std::fun
         }
     };
 
-    cli.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
+    cli.onMessage = [&onMessage](const SocketChannelPtr &channel, Buffer *buf) {
         onMessage(buf);
     };
 
@@ -97,11 +72,6 @@ int TCP_Client_Instance(int remote_port, const char *remote_host, const std::fun
 #endif
 
     cli.start();
-
-    //必须在内部才能阻止客户端退出
-    while (true){
-        sleep(300);
-    }
     return 0;
 }
 
@@ -123,15 +93,12 @@ void init() {
 
     FILE *fp = fopen(TCP_SERVER_LOCK, "w");
     fclose(fp);
-};
+}
 
 int main(int argc, char *argv[]) {
     hlog_set_level(LOG_LEVEL_DEBUG);
     // 将 stdout 重定向到文件
     if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
-        perror("freopen stdout failed");
-    }
-    if (freopen(TCP_SERVER_LOG, "w", stderr) == nullptr) {
         perror("freopen stdout failed");
     }
     //记录主板唯一ID
@@ -153,37 +120,36 @@ int main(int argc, char *argv[]) {
         //串口初始化
         serial.UART_init();
 
-        //实例化服务器消息处理
+        //实例化服务端消息处理
         Verification verification(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
 
-        //实例化串口消息处理
-        VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
-
         //系统服务
-        UART_TcpServer_Instance(svr_sys, SYS_PORT, verification,
+        UART_TcpServer_Instance(svr_sys, SYS_PORT,
                                 std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
 
         //串口0透传服务
-        UART_TcpServer_Instance(srv_0, UART0_PORT, verification,
+        UART_TcpServer_Instance(srv_0, UART0_PORT,
                                 std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
 
         //串口1透传服务
-        UART_TcpServer_Instance(srv_1, UART1_PORT, verification,
+        UART_TcpServer_Instance(srv_1, UART1_PORT,
                                 std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
 
         //串口2透传服务
-        UART_TcpServer_Instance(srv_2, UART2_PORT, verification,
+        UART_TcpServer_Instance(srv_2, UART2_PORT,
                                 std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
 
         //串口3透传服务
-        UART_TcpServer_Instance(srv_3, UART3_PORT, verification,
+        UART_TcpServer_Instance(srv_3, UART3_PORT,
                                 std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
 
         if (ToolKits::isFileExists(DEMO_LOCK)) {
             verification.svr_demoThread();
         }
 
-        //串口消息处理
+        //实例化串口消息处理
+        VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
+        //串口消息处理线程
         verificationReceive.UART_receiveThread();
 
         while (true) {
@@ -210,9 +176,17 @@ int main(int argc, char *argv[]) {
             ip = ToolKits::getGateway();
         }
         printf("the eth0 gateway is %s\r\n", ip.c_str());
+
+        TcpClient cli;
+        //实例化客户端消息处理
         ClientMessageCallback clientMessageCallback;
-        TCP_Client_Instance(SYS_PORT, ip.c_str(),
+        TCP_Client_Instance(cli, SYS_PORT, ip.c_str(),
                             std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
+
+
+        while (true){
+            sleep(300);
+        }
 
     }
     return 0;

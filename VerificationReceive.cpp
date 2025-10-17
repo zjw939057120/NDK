@@ -60,8 +60,8 @@ void VerificationReceive::UART0_receiveThreadHandle() {
                  buffer[4] == 0x01 && buffer[5] == 0x01)
             //过滤电池故障CAN扩展帧0x88, 0x18, 0xFF, 0xFF, 0x01, 0x01
             continue;
-        printf("UART0:%zd: ", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART0:%zd: ", len);
+//        ToolKits::dump(buffer, len);
         m_srv_0.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -73,8 +73,8 @@ void VerificationReceive::UART1_receiveThreadHandle() {
         len = m_serial.UART1_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART1:%zd: ", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART1:%zd: ", len);
+//        ToolKits::dump(buffer, len);
         m_srv_1.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -86,8 +86,8 @@ void VerificationReceive::UART2_receiveThreadHandle() {
         len = m_serial.UART2_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART2:%zd: ", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART2:%zd: ", len);
+//        ToolKits::dump(buffer, len);
         m_srv_2.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -99,8 +99,8 @@ void VerificationReceive::UART3_receiveThreadHandle() {
         len = m_serial.UART3_receive(buffer, IMU_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART3:%zd: ", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART3:%zd: ", len);
+//        ToolKits::dump(buffer, len);
         m_srv_3.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -112,8 +112,8 @@ void VerificationReceive::UART4_receiveThreadHandle() {
         len = m_serial.UART4_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART4:%zd: \r\n", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART4:%zd: \r\n", len);
+//        ToolKits::dump(buffer, len);
         m_srv_0.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -125,8 +125,8 @@ void VerificationReceive::UART5_receiveThreadHandle() {
         len = m_serial.UART5_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART5:%zd: \r\n", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART5:%zd: \r\n", len);
+//        ToolKits::dump(buffer, len);
         m_srv_0.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -138,8 +138,8 @@ void VerificationReceive::UART6_receiveThreadHandle() {
         len = m_serial.UART6_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART6:%zd: \r\n", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART6:%zd: \r\n", len);
+//        ToolKits::dump(buffer, len);
         m_srv_0.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
@@ -151,8 +151,8 @@ void VerificationReceive::UART7_receiveThreadHandle() {
         len = m_serial.UART7_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
-        printf("UART7:%zd: ", len);
-        ToolKits::dump(buffer, len);
+//        printf("UART7:%zd: ", len);
+//        ToolKits::dump(buffer, len);
         m_srv_0.broadcast((const void *) buffer, len); // 转发串口数据到tcp客户端
     }
 }
