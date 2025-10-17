@@ -1,4 +1,4 @@
-cd cmake-build-debug
+cd cmake-build-release
 cmake --build . --target all -- -j 64
 
 adb root

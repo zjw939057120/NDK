@@ -16,7 +16,7 @@ int UART_TcpServer_Instance(TcpServer &srv, int port, const std::function<void(B
                    currentThreadEventLoop->tid());
         }
     };
-    srv.onMessage = [&onMessage](const SocketChannelPtr &channel, Buffer *buf) {
+    srv.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
         onMessage(buf);
     };
     srv.setThreadNum(4);
@@ -53,7 +53,7 @@ int TCP_Client_Instance(TcpClient &cli, int remote_port, const char *remote_host
         }
     };
 
-    cli.onMessage = [&onMessage](const SocketChannelPtr &channel, Buffer *buf) {
+    cli.onMessage = [onMessage](const SocketChannelPtr &channel, Buffer *buf) {
         onMessage(buf);
     };
 
