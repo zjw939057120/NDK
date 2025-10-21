@@ -82,11 +82,13 @@ void init() {
     //取消通知提示音
     std::system("settings put system notification_sound null");
     //存在串口模块判定为中控系统
-    if (ToolKits::isFileExists(UART1_PATH)) {
-        printf("the %s found\r\n", UART1_PATH);
+    if (ToolKits::isDeviceExist(EC20_PATH)) {
+        printf("the %s found\r\n", EC20_PATH);
+        ToolKits::enablePackage(PACKAGE_COM_HBTENGLV_BOAT);
         //禁用娱乐屏app
         ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT_HOME);
     } else {
+        ToolKits::enablePackage(PACKAGE_COM_HBTENGLV_BOAT_HOME);
         //禁用中控屏app
         ToolKits::disablePackage(PACKAGE_COM_HBTENGLV_BOAT);
     }
@@ -98,9 +100,9 @@ void init() {
 int main(int argc, char *argv[]) {
     hlog_set_level(LOG_LEVEL_DEBUG);
     // 将 stdout 重定向到文件
-    if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
+    /*if (freopen(TCP_SERVER_LOG, "w", stdout) == nullptr) {
         perror("freopen stdout failed");
-    }
+    }*/
     //记录主板唯一ID
     ToolKits::getSerialNumber();
 

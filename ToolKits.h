@@ -45,6 +45,8 @@ public:
 
     static void disablePackage(const std::string& package);
 
+    static void enablePackage(const std::string& package);
+
     static std::string getGateway() ;
 };
 

@@ -100,6 +100,11 @@ void ToolKits::disablePackage(const std::string &package) {
     system(command);
 }
 
+void ToolKits::enablePackage(const std::string &package) {
+    char command[255];
+    sprintf(command, "pm enable --user 0 %s", package.c_str());
+    system(command);
+}
 
 std::string ToolKits::getGateway() {
     char command[255];
