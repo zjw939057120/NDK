@@ -46,8 +46,38 @@ void Verification::svr_sys_onMessageCallback(Buffer *buf) {
             Sys_MsgType_0x01(buffer, msgId, msgBody);
             break;
         }
+        case 0x02:
+        {
+            Sys_MsgType_0x02(buffer, msgId, msgBody);
+            break;
+        }
+        case 0x03:
+        {
+            Sys_MsgType_0x03(buffer, msgId, msgBody);
+            break;
+        }
+        case 0x10://APP双屏互动消息
+        {
+            Sys_MsgType_0x10(buffer, msgId, msgBody);
+            break;
+        }
+        case 0x11://APP双屏互动消息
+        {
+            Sys_MsgType_0x11(buffer, msgId, msgBody);
+            break;
+        }
+        case 0x12://APP双屏互动消息
+        {
+            Sys_MsgType_0x12(buffer, msgId, msgBody);
+            break;
+        }
+        case 0x13://APP双屏互动消息
+        {
+            Sys_MsgType_0x13(buffer, msgId, msgBody);
+            break;
+        }
         default:
-            m_srv_sys.broadcast(can_buf_empty, CAN_BUFFER_LEN);
+            m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
             break;
     }
 }
@@ -169,6 +199,32 @@ void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8
     }
 }
 
+
+void Verification::Sys_MsgType_0x02(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    std::system("sync &");
+    m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+}
+
+void Verification::Sys_MsgType_0x03(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    std::system("sync &");
+    m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+}
+
+void Verification::Sys_MsgType_0x10(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+}
+
+void Verification::Sys_MsgType_0x11(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+}
+
+void Verification::Sys_MsgType_0x12(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+}
+
+void Verification::Sys_MsgType_0x13(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
+}
 void Verification::svr_demoThread() {
     //推进器、电池demo线程
     std::thread t0([this]() {

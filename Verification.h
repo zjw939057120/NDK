@@ -50,9 +50,37 @@ public:
     /// @return
     void svr3_onMessageCallback(Buffer *buf);
 
+    /// @brief  TCP消息处理 系统基本消息
+    /// @return
     void Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
 
+    /// @brief  TCP消息处理 系统扩展消息
+    /// @return
     void Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    /// @brief  TCP消息处理
+    /// @return
+    void Sys_MsgType_0x02(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    /// @brief  TCP消息处理
+    /// @return
+    void Sys_MsgType_0x03(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    /// @brief  TCP消息处理 APP双屏互动消息
+    /// @return
+    void Sys_MsgType_0x10(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    /// @brief  TCP消息处理 APP双屏互动消息
+    /// @return
+    void Sys_MsgType_0x11(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    /// @brief  TCP消息处理 APP双屏互动消息
+    /// @return
+    void Sys_MsgType_0x12(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
+
+    /// @brief  TCP消息处理 APP双屏互动消息
+    /// @return
+    void Sys_MsgType_0x13(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody);
 
     void svr_demoThread();
 
