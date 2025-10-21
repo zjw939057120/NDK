@@ -17,6 +17,11 @@
 #define SWITCH_5 41 //GPIO1_B1
 #define SWITCH_6 42 //GPIO1_B2
 
+//主板序列号
+#define BOARD_SERIAL " /data/local/addition/tmp/serial"
+//主板网关
+#define BOARD_GATEWAY " /data/local/addition/tmp/gateway"
+
 class ToolKits {
 public:
 

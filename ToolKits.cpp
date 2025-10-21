@@ -62,11 +62,11 @@ std::string ToolKits::getSerialNumber() {
     sprintf(command, "grep \"Serial\" /proc/cpuinfo  | cut -d':' -f2 | xargs | tr -d '\\n'");
     std::string ret = execCommand(command);
     printf("the Serial is %s\r\n", ret.c_str());
-    sprintf(command, "echo -n %s > /data/local/addition/Serial", ret.c_str());
+    sprintf(command, "echo -n %s > %s", ret.c_str(), BOARD_SERIAL);
     system(command);
-    sprintf(command, "id > /data/local/addition/id");
+    sprintf(command, "chmod 755 %s", BOARD_SERIAL);
     system(command);
-    system("chmod 755 /data/local/addition/Serial");
+    system("id > /data/local/addition/id");
     return ret;
 }
 
@@ -106,9 +106,10 @@ std::string ToolKits::getGateway() {
     sprintf(command, "ip route show table eth0 | head -n1 | awk '{print $3}' | tr -d '\\n'");
     std::string ret = execCommand(command);
     if (!ret.empty()) {
-        sprintf(command, "echo -n %s > /data/local/addition/Gateway", ret.c_str());
+        sprintf(command, "echo -n %s > %s", ret.c_str(), BOARD_GATEWAY);
         system(command);
-        system("chmod 755 /data/local/addition/Gateway");
+        sprintf(command, "chmod 755 %s", BOARD_GATEWAY);
+        system(command);
     }
     return ret;
 }
