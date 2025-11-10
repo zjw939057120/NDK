@@ -2,8 +2,8 @@
 // Created by Administrator on 2025/6/10.
 //
 
-#ifndef TCPSERVER_VERIFICATION_H
-#define TCPSERVER_VERIFICATION_H
+#ifndef TCPSERVER_SERIALMESSAGECALLBACK_H
+#define TCPSERVER_SERIALMESSAGECALLBACK_H
 
 #include "hv/TcpServer.h"
 #include "Serial.h"
@@ -25,9 +25,9 @@
 
 using namespace hv;
 
-class Verification {
+class SerialMessageCallback {
 public:
-    Verification(Serial &serial,
+    SerialMessageCallback(Serial &serial,
                  TcpServer &SYS_srv, TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv, TcpServer &UART3_srv);
 
     /// @brief  TCP消息处理
@@ -156,4 +156,4 @@ enum E_SYS_EXT_MSG_ID {
     E_SYS_EXT_MSG_ID_DEMO_EXIT = 1,//退出DEMO模式
 };
 
-#endif // TCPSERVER_VERIFICATION_H
+#endif // TCPSERVER_SERIALMESSAGECALLBACK_H

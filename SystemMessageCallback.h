@@ -2,14 +2,14 @@
 // Created by Administrator on 2025/10/14.
 //
 
-#ifndef TCPSERVER_CLIENTMESSAGECALLBACK_H
-#define TCPSERVER_CLIENTMESSAGECALLBACK_H
+#ifndef TCPSERVER_SYSTEMMESSAGECALLBACK_H
+#define TCPSERVER_SYSTEMMESSAGECALLBACK_H
 
 #include "hv/TcpServer.h"
 
 using namespace hv;
 
-class ClientMessageCallback {
+class SystemMessageCallback {
 public:
     void onMessageCallback(Buffer *buf);
 
@@ -21,4 +21,4 @@ private:
 };
 
 
-#endif //TCPSERVER_CLIENTMESSAGECALLBACK_H
+#endif //TCPSERVER_SYSTEMMESSAGECALLBACK_H

@@ -2,11 +2,11 @@
 // Created by Administrator on 2025/10/14.
 //
 
-#include "ClientMessageCallback.h"
-#include "Verification.h"
+#include "SystemMessageCallback.h"
+#include "SerialMessageCallback.h"
 #include "ToolKits.h"
 
-void ClientMessageCallback::onMessageCallback(Buffer *buf) {
+void SystemMessageCallback::onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //系统消息,校验数据长度
@@ -42,7 +42,7 @@ void ClientMessageCallback::onMessageCallback(Buffer *buf) {
     }
 }
 
-void ClientMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SystemMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
 
     switch ((E_SYS_MSG_ID) msgId) {
@@ -67,7 +67,7 @@ void ClientMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
     }
 }
 
-void ClientMessageCallback::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SystemMessageCallback::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
 
     switch ((E_SYS_EXT_MSG_ID) msgId) {

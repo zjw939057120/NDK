@@ -52,114 +52,113 @@
 class Serial {
 
 public:
-    void UART_init();
+    void Serial_init();
 
-    int UART0_open();
+    int Serial0_open();
 
-    int UART0_close();
+    int Serial0_close();
 
-    ssize_t UART0_receive(void *buf, size_t count);
+    ssize_t Serial0_receive(void *buf, size_t count);
 
-    ssize_t UART0_send(const void *buf, size_t count);
+    ssize_t Serial0_send(const void *buf, size_t count);
 
-    ssize_t UART0_sendTest();
+    ssize_t Serial0_sendTest();
 
-    int UART1_open();
+    int Serial1_open();
 
-    int UART1_close();
+    int Serial1_close();
 
-    ssize_t UART1_receive(void *buf, size_t count);
+    ssize_t Serial1_receive(void *buf, size_t count);
 
-    ssize_t UART1_send(const void *buf, size_t count);
+    ssize_t Serial1_send(const void *buf, size_t count);
 
-    ssize_t UART1_sendTest();
+    ssize_t Serial1_sendTest();
 
-    int UART2_open();
+    int Serial2_open();
 
-    int UART2_close();
+    int Serial2_close();
 
-    ssize_t UART2_receive(void *buf, size_t count);
+    ssize_t Serial2_receive(void *buf, size_t count);
 
-    ssize_t UART2_send(const void *buf, size_t count);
+    ssize_t Serial2_send(const void *buf, size_t count);
 
-    ssize_t UART2_sendTest();
+    ssize_t Serial2_sendTest();
 
-    int UART3_open();
+    int Serial3_open();
 
-    int UART3_close();
+    int Serial3_close();
 
-    ssize_t UART3_receive(void *buf, size_t count);
+    ssize_t Serial3_receive(void *buf, size_t count);
 
-    ssize_t UART3_send(const void *buf, size_t count);
+    ssize_t Serial3_send(const void *buf, size_t count);
 
-    ssize_t UART3_sendTest();
+    ssize_t Serial3_sendTest();
 
+    int Serial4_open();
 
-    int UART4_open();
+    int Serial4_close();
 
-    int UART4_close();
+    ssize_t Serial4_receive(void *buf, size_t count);
 
-    ssize_t UART4_receive(void *buf, size_t count);
+    ssize_t Serial4_send(const void *buf, size_t count);
 
-    ssize_t UART4_send(const void *buf, size_t count);
+    ssize_t Serial4_sendTest();
 
-    ssize_t UART4_sendTest();
+    int Serial5_open();
 
-    int UART5_open();
+    int Serial5_close();
 
-    int UART5_close();
+    ssize_t Serial5_receive(void *buf, size_t count);
 
-    ssize_t UART5_receive(void *buf, size_t count);
+    ssize_t Serial5_send(const void *buf, size_t count);
 
-    ssize_t UART5_send(const void *buf, size_t count);
+    ssize_t Serial5_sendTest();
 
-    ssize_t UART5_sendTest();
+    int Serial6_open();
 
-    int UART6_open();
+    int Serial6_close();
 
-    int UART6_close();
+    ssize_t Serial6_receive(void *buf, size_t count);
 
-    ssize_t UART6_receive(void *buf, size_t count);
+    ssize_t Serial6_send(const void *buf, size_t count);
 
-    ssize_t UART6_send(const void *buf, size_t count);
+    ssize_t Serial6_sendTest();
 
-    ssize_t UART6_sendTest();
+    int Serial7_open();
 
-    int UART7_open();
+    int Serial7_close();
 
-    int UART7_close();
+    ssize_t Serial7_receive(void *buf, size_t count);
 
-    ssize_t UART7_receive(void *buf, size_t count);
+    ssize_t Serial7_send(const void *buf, size_t count);
 
-    ssize_t UART7_send(const void *buf, size_t count);
-
-    ssize_t UART7_sendTest();
+    ssize_t Serial7_sendTest();
 
 private:
     /// @brief 打开串口设备
     /// @return
-    int UART_open(const char *path, int &fd, int speed);
+    int Serial_open(const char *path, int &fd, int speed);
 
     /// @brief 关闭串口设备
     /// @return
-    int UART_close(int &fd);
+    int Serial_close(int &fd);
 
     /// @brief 设置串口参数（如波特率等
     /// @param speed
     /// @return
-    int UART_setAttribs(int &fd, int speed);
+    int Serial_setAttribs(int &fd, int speed);
 
     /// @brief 从串口接收数据
     /// @param buf
     /// @param count
     /// @return
-    ssize_t UART_receive(int &fd, void *buf, size_t count);
+    ssize_t Serial_receive(int &fd, void *buf, size_t count);
 
     /// @brief 向串口发送数据
     /// @param buf
     /// @param count
     /// @return
-    ssize_t UART_send(int &fd, const void *buf, size_t count);
+    ssize_t Serial_send(int &fd, const void *buf, size_t count);
 
 public:
     /// @brief 串口文件描述符，打开后用于读写操作

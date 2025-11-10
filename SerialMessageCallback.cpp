@@ -3,10 +3,10 @@
 //
 
 #include <iostream>
-#include "Verification.h"
+#include "SerialMessageCallback.h"
 #include "ToolKits.h"
 
-Verification::Verification(Serial &serial,
+SerialMessageCallback::SerialMessageCallback(Serial &serial,
                            TcpServer &SYS_srv, TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv,
                            TcpServer &UART3_srv)
         : m_serial(serial),
@@ -14,7 +14,7 @@ Verification::Verification(Serial &serial,
 
 }
 
-void Verification::svr_sys_onMessageCallback(Buffer *buf) {
+void SerialMessageCallback::svr_sys_onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //系统消息,校验数据长度
@@ -82,7 +82,7 @@ void Verification::svr_sys_onMessageCallback(Buffer *buf) {
     }
 }
 
-void Verification::svr0_onMessageCallback(Buffer *buf) {
+void SerialMessageCallback::svr0_onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //CAN消息,校验数据长度
@@ -91,10 +91,10 @@ void Verification::svr0_onMessageCallback(Buffer *buf) {
 //        m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
 //        return;
 //    }
-    m_serial.UART0_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
+    m_serial.Serial0_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
 }
 
-void Verification::svr1_onMessageCallback(Buffer *buf) {
+void SerialMessageCallback::svr1_onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //控制器消息,校验数据长度
@@ -103,10 +103,10 @@ void Verification::svr1_onMessageCallback(Buffer *buf) {
 //        m_srv_1.broadcast(can_buf_empty, CAN_BUFFER_LEN);
 //        return;
 //    }
-    m_serial.UART1_send(buffer, size); // 转发tcp客户端数据到串口
+    m_serial.Serial1_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
-void Verification::svr2_onMessageCallback(Buffer *buf) {
+void SerialMessageCallback::svr2_onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //继电器消息,校验数据长度
@@ -115,10 +115,10 @@ void Verification::svr2_onMessageCallback(Buffer *buf) {
 //        m_srv_2.broadcast(can_buf_empty, CAN_BUFFER_LEN);
 //        return;
 //    }
-    m_serial.UART2_send(buffer, size); // 转发tcp客户端数据到串口
+    m_serial.Serial2_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
-void Verification::svr3_onMessageCallback(Buffer *buf) {
+void SerialMessageCallback::svr3_onMessageCallback(Buffer *buf) {
     size_t size = buf->size();
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //惯导消息,校验数据长度
@@ -127,10 +127,10 @@ void Verification::svr3_onMessageCallback(Buffer *buf) {
 //        m_srv_3.broadcast(can_buf_empty, CAN_BUFFER_LEN);
 //        return;
 //    }
-    m_serial.UART3_send(buffer, size); // 转发tcp客户端数据到串口
+    m_serial.Serial3_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
-void Verification::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 
@@ -168,7 +168,7 @@ void Verification::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8
     }
 }
 
-void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 
@@ -200,32 +200,32 @@ void Verification::Sys_MsgType_0x01(uint8_t *buffer, uint32_t msgId, const uint8
 }
 
 
-void Verification::Sys_MsgType_0x02(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x02(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
 
-void Verification::Sys_MsgType_0x03(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x03(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     std::system("sync &");
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
 
-void Verification::Sys_MsgType_0x10(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x10(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
 
-void Verification::Sys_MsgType_0x11(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x11(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
 
-void Verification::Sys_MsgType_0x12(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x12(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
 
-void Verification::Sys_MsgType_0x13(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+void SerialMessageCallback::Sys_MsgType_0x13(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
-void Verification::svr_demoThread() {
+void SerialMessageCallback::svr_demoThread() {
     //推进器、电池demo线程
     std::thread t0([this]() {
         while (true) {
@@ -259,7 +259,7 @@ void Verification::svr_demoThread() {
     t3.detach();
 }
 
-void Verification::svr0_demoThreadHandle() {
+void SerialMessageCallback::svr0_demoThreadHandle() {
     usleep(1000 * 100);
     //模块测试数据
     m_srv_0.broadcast(can_buf_0x200, sizeof(can_buf_0x200));
@@ -276,49 +276,49 @@ void Verification::svr0_demoThreadHandle() {
     sleep(1);
 }
 
-void Verification::svr1_demoThreadHandle() {
+void SerialMessageCallback::svr1_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 200);
     m_srv_1.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
-void Verification::svr2_demoThreadHandle() {
+void SerialMessageCallback::svr2_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 300);
     m_srv_2.broadcast(relay_buf_0x0103, sizeof(relay_buf_0x0103));
     sleep(10);
 }
 
-void Verification::svr3_demoThreadHandle() {
+void SerialMessageCallback::svr3_demoThreadHandle() {
     usleep(1000 * 400);
     //模块测试数据
     m_srv_3.broadcast(imu_buf_0x05, sizeof(imu_buf_0x05));
     sleep(1);
 }
 
-void Verification::svr4_demoThreadHandle() {
+void SerialMessageCallback::svr4_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 500);
     m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
-void Verification::svr5_demoThreadHandle() {
+void SerialMessageCallback::svr5_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 600);
     m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
-void Verification::svr6_demoThreadHandle() {
+void SerialMessageCallback::svr6_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 700);
     m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));
     sleep(10);
 }
 
-void Verification::svr7_demoThreadHandle() {
+void SerialMessageCallback::svr7_demoThreadHandle() {
     //模块测试数据
     usleep(1000 * 800);
     m_srv_0.broadcast(can_buf_empty, sizeof(can_buf_empty));

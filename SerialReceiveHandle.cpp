@@ -2,11 +2,11 @@
 // Created by Administrator on 2025/7/4.
 //
 
-#include "VerificationReceive.h"
-#include "Verification.h"
+#include "SerialReceiveHandle.h"
+#include "SerialMessageCallback.h"
 #include "ToolKits.h"
 
-VerificationReceive::VerificationReceive(Serial &serial, TcpServer &UART0_srv, TcpServer &UART1_srv,
+SerialReceiveHandle::SerialReceiveHandle(Serial &serial, TcpServer &UART0_srv, TcpServer &UART1_srv,
                                          TcpServer &UART2_srv,
                                          TcpServer &UART3_srv)
         : m_serial(serial),
@@ -14,11 +14,11 @@ VerificationReceive::VerificationReceive(Serial &serial, TcpServer &UART0_srv, T
 
 }
 
-void VerificationReceive::UART_receiveThread() {
+void SerialReceiveHandle::Serial_receiveHandle() {
     //CAN模块消息线程
     if (m_serial.uart0_fd) {
         std::thread uart0([this]() {
-            UART0_receiveThreadHandle();
+            Serial0_receiveHandle();
         });
         uart0.detach();
     }
@@ -26,7 +26,7 @@ void VerificationReceive::UART_receiveThread() {
     //控制器模块消息线程
     if (m_serial.uart1_fd) {
         std::thread uart1([this]() {
-            UART1_receiveThreadHandle();
+            Serial1_receiveHandle();
         });
         uart1.detach();
     }
@@ -34,7 +34,7 @@ void VerificationReceive::UART_receiveThread() {
     //继电器模块消息线程
     if (m_serial.uart2_fd) {
         std::thread uart2([this]() {
-            UART2_receiveThreadHandle();
+            Serial2_receiveHandle();
         });
         uart2.detach();
     }
@@ -42,18 +42,18 @@ void VerificationReceive::UART_receiveThread() {
     //惯导模块消息线程
     if (m_serial.uart3_fd) {
         std::thread uart3([this]() {
-            UART3_receiveThreadHandle();
+            Serial3_receiveHandle();
         });
         uart3.detach();
     }
 
 }
 
-void VerificationReceive::UART0_receiveThreadHandle() {
+void SerialReceiveHandle::Serial0_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取CAN模块串口数据
     ssize_t len;
     while (m_serial.uart0_fd) {
-        len = m_serial.UART0_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial0_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
         else if (len == CAN_BUFFER_LEN && buffer[1] == 0x18 && buffer[2] == 0xFF && buffer[3] == 0xFF &&
@@ -66,11 +66,11 @@ void VerificationReceive::UART0_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART1_receiveThreadHandle() {
+void SerialReceiveHandle::Serial1_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取控制器模块串口数据
     ssize_t len;
     while (m_serial.uart1_fd) {
-        len = m_serial.UART1_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial1_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART1:%zd: ", len);
@@ -79,11 +79,11 @@ void VerificationReceive::UART1_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART2_receiveThreadHandle() {
+void SerialReceiveHandle::Serial2_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取继电器串口数据
     ssize_t len;
     while (m_serial.uart2_fd) {
-        len = m_serial.UART2_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial2_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART2:%zd: ", len);
@@ -92,11 +92,11 @@ void VerificationReceive::UART2_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART3_receiveThreadHandle() {
+void SerialReceiveHandle::Serial3_receiveHandle() {
     uint8_t buffer[IMU_BUFFER_LEN]; // 读取惯串口数据
     ssize_t len;
     while (m_serial.uart3_fd) {
-        len = m_serial.UART3_receive(buffer, IMU_BUFFER_LEN);
+        len = m_serial.Serial3_receive(buffer, IMU_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART3:%zd: ", len);
@@ -105,11 +105,11 @@ void VerificationReceive::UART3_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART4_receiveThreadHandle() {
+void SerialReceiveHandle::Serial4_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
     while (m_serial.uart4_fd) {
-        len = m_serial.UART4_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial4_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART4:%zd: \r\n", len);
@@ -118,11 +118,11 @@ void VerificationReceive::UART4_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART5_receiveThreadHandle() {
+void SerialReceiveHandle::Serial5_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
     while (m_serial.uart5_fd) {
-        len = m_serial.UART5_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial5_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART5:%zd: \r\n", len);
@@ -131,11 +131,11 @@ void VerificationReceive::UART5_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART6_receiveThreadHandle() {
+void SerialReceiveHandle::Serial6_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
     while (m_serial.uart7_fd) {
-        len = m_serial.UART6_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial6_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART6:%zd: \r\n", len);
@@ -144,11 +144,11 @@ void VerificationReceive::UART6_receiveThreadHandle() {
     }
 }
 
-void VerificationReceive::UART7_receiveThreadHandle() {
+void SerialReceiveHandle::Serial7_receiveHandle() {
     uint8_t buffer[CAN_BUFFER_LEN]; // 读取串口数据
     ssize_t len;
     while (m_serial.uart7_fd) {
-        len = m_serial.UART7_receive(buffer, CAN_BUFFER_LEN);
+        len = m_serial.Serial7_receive(buffer, CAN_BUFFER_LEN);
         if (len < 1)
             continue;
 //        printf("UART7:%zd: ", len);

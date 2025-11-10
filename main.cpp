@@ -120,50 +120,50 @@ int main(int argc, char *argv[]) {
     //中控屏服务端应用
     if (ToolKits::isDeviceExist(EC20_PATH)) {
         //串口初始化
-        serial.UART_init();
+        serial.Serial_init();
 
         //实例化服务端消息处理
-        Verification verification(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
+        SerialMessageCallback serialMessageCallback(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
 
         //系统服务
         UART_TcpServer_Instance(svr_sys, SYS_PORT,
-                                std::bind(&Verification::svr_sys_onMessageCallback, &verification, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr_sys_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
 
         //串口0透传服务
         UART_TcpServer_Instance(srv_0, UART0_PORT,
-                                std::bind(&Verification::svr0_onMessageCallback, &verification, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr0_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
 
         //串口1透传服务
         UART_TcpServer_Instance(srv_1, UART1_PORT,
-                                std::bind(&Verification::svr1_onMessageCallback, &verification, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr1_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
 
         //串口2透传服务
         UART_TcpServer_Instance(srv_2, UART2_PORT,
-                                std::bind(&Verification::svr2_onMessageCallback, &verification, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr2_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
 
         //串口3透传服务
         UART_TcpServer_Instance(srv_3, UART3_PORT,
-                                std::bind(&Verification::svr3_onMessageCallback, &verification, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr3_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
 
         if (ToolKits::isFileExists(DEMO_LOCK)) {
-            verification.svr_demoThread();
+            serialMessageCallback.svr_demoThread();
         }
 
         //实例化串口消息处理
-        VerificationReceive verificationReceive(serial, srv_0, srv_1, srv_2, srv_3);
+        SerialReceiveHandle serialReceiveHandle(serial, srv_0, srv_1, srv_2, srv_3);
         //串口消息处理线程
-        verificationReceive.UART_receiveThread();
+        serialReceiveHandle.Serial_receiveHandle();
 
         while (true) {
             if (!ToolKits::isDeviceExist(UART0_PATH)) {
-                serial.UART0_close();
-                serial.UART1_close();
-                serial.UART2_close();
-                serial.UART3_close();
-                serial.UART4_close();
-                serial.UART5_close();
-                serial.UART6_close();
-                serial.UART7_close();
+                serial.Serial0_close();
+                serial.Serial1_close();
+                serial.Serial2_close();
+                serial.Serial3_close();
+                serial.Serial4_close();
+                serial.Serial5_close();
+                serial.Serial6_close();
+                serial.Serial7_close();
             }
             sleep(60);
         }
@@ -181,9 +181,9 @@ int main(int argc, char *argv[]) {
 
         TcpClient cli;
         //实例化客户端消息处理
-        ClientMessageCallback clientMessageCallback;
+        SystemMessageCallback systemMessageCallback;
         TCP_Client_Instance(cli, SYS_PORT, ip.c_str(),
-                            std::bind(&ClientMessageCallback::onMessageCallback, &clientMessageCallback, std::placeholders::_1));
+                            std::bind(&SystemMessageCallback::onMessageCallback, &systemMessageCallback, std::placeholders::_1));
 
 
         while (true){
