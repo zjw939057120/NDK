@@ -131,17 +131,20 @@ void SerialMessageCallback::svr3_onMessageCallback(Buffer *buf) {
 }
 
 void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
+    //保存数据
     std::system("sync &");
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 
     switch ((E_SYS_MSG_ID) msgId) {
         case E_SYS_MSG_ID_SETTINGS: {
+            //打开设置
             std::system("am start -a android.settings.SETTINGS");
             break;
         }
         case E_SYS_MSG_ID_SHUTDOWN: {
             std::thread t([]() {
                 sleep(1);
+                //关机
                 std::system("svc power shutdown");
             });
             t.detach();
@@ -150,6 +153,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_REBOOT: {
             std::thread t([]() {
                 sleep(1);
+                //重启
                 std::system("svc power reboot");
             });
             t.detach();
@@ -158,7 +162,19 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
             std::thread t([]() {
                 sleep(1);
+                //进入刷机模式
                 std::system("svc power reboot loader");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_SYNC: {
+            break;
+        }
+        case E_SYS_MSG_ID_POWER: {
+            std::thread t([]() {
+                //模拟电源按键
+                std::system("input keyevent POWER");
             });
             t.detach();
             break;
