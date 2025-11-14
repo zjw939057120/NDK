@@ -137,14 +137,13 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
 
     switch ((E_SYS_MSG_ID) msgId) {
         case E_SYS_MSG_ID_SETTINGS: {
-            //打开设置
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));
             std::system("am start -a android.settings.SETTINGS");
             break;
         }
         case E_SYS_MSG_ID_SHUTDOWN: {
             std::thread t([]() {
-                sleep(1);
-                //关机
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 std::system("svc power shutdown");
             });
             t.detach();
@@ -152,8 +151,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         }
         case E_SYS_MSG_ID_REBOOT: {
             std::thread t([]() {
-                sleep(1);
-                //重启
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 std::system("svc power reboot");
             });
             t.detach();
@@ -161,18 +159,88 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         }
         case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
             std::thread t([]() {
-                sleep(1);
-                //进入刷机模式
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
                 std::system("svc power reboot loader");
             });
             t.detach();
             break;
         }
-        case E_SYS_MSG_ID_POWER: {
+        case E_SYS_MSG_ID_KEYCODE_HOME: {
             std::thread t([]() {
-                sleep(1);
-                //模拟电源按键
-                std::system("input keyevent POWER");
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_HOME");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_MENU: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_MENU");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_VOLUME_DOWN: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_VOLUME_DOWN");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_VOLUME_UP: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_VOLUME_UP");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_VOLUME_MUTE: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_VOLUME_MUTE");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_POWER: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_POWER");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_SLEEP: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_SLEEP");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_KEYCODE_WAKEUP: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("input keyevent KEYCODE_WAKEUP");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_SCREEN_OFF: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("echo off > /sys/class/drm/card0-HDMI-A-1/status");
+            });
+            t.detach();
+            break;
+        }
+        case E_SYS_MSG_ID_SCREEN_ON: {
+            std::thread t([]() {
+                std::this_thread::sleep_for(std::chrono::milliseconds(200));
+                std::system("echo on > /sys/class/drm/card0-HDMI-A-1/status");
             });
             t.detach();
             break;

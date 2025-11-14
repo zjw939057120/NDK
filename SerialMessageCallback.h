@@ -148,7 +148,16 @@ enum E_SYS_MSG_ID {
     E_SYS_MSG_ID_SHUTDOWN = 1,//关机
     E_SYS_MSG_ID_REBOOT = 2,//重启
     E_SYS_MSG_ID_REBOOT_BOOTLOADER = 3,//进入刷机模式
-    E_SYS_MSG_ID_POWER = 4,//模拟电源按键
+    E_SYS_MSG_ID_KEYCODE_HOME = 4, //主页按键
+    E_SYS_MSG_ID_KEYCODE_MENU = 5, //菜单按键
+    E_SYS_MSG_ID_KEYCODE_VOLUME_DOWN = 6, //音量减按键
+    E_SYS_MSG_ID_KEYCODE_VOLUME_UP = 7,//音量加按键
+    E_SYS_MSG_ID_KEYCODE_VOLUME_MUTE = 8,//静音按键
+    E_SYS_MSG_ID_KEYCODE_POWER = 9,//电源按键
+    E_SYS_MSG_ID_KEYCODE_SLEEP = 10,//休眠按键
+    E_SYS_MSG_ID_KEYCODE_WAKEUP = 11,//唤醒按键
+    E_SYS_MSG_ID_SCREEN_OFF = 12,//唤醒按键
+    E_SYS_MSG_ID_SCREEN_ON = 13,//唤醒按键
 };
 
 //系统扩展消息枚举
