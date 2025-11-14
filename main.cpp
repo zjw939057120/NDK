@@ -1,4 +1,5 @@
 #include "main.h"
+#include "InputEvent.h"
 
 int UART_TcpServer_Instance(TcpServer &srv, int port, const std::function<void(Buffer *)> &onMessage) {
     int listenfd = srv.createsocket(port);
@@ -35,7 +36,8 @@ srv.withTLS(&ssl_opt);
     return 0;
 };
 
-int TCP_Client_Instance(TcpClient &cli, int remote_port, const char *remote_host, const std::function<void(Buffer *)> &onMessage) {
+int TCP_Client_Instance(TcpClient &cli, int remote_port, const char *remote_host,
+                        const std::function<void(Buffer *)> &onMessage) {
     int connfd = cli.createsocket(remote_port, remote_host);
     if (connfd < 0) {
         return -20;
@@ -108,17 +110,14 @@ int main(int argc, char *argv[]) {
 
     //环境初始化
     init();
-
-    Serial serial;
-    TcpServer svr_sys;
-    TcpServer srv_0;
-    TcpServer srv_1;
-    TcpServer srv_2;
-    TcpServer srv_3;
-
-
     //中控屏服务端应用
     if (ToolKits::isDeviceExist(EC20_PATH)) {
+        Serial serial;
+        TcpServer svr_sys;
+        TcpServer srv_0;
+        TcpServer srv_1;
+        TcpServer srv_2;
+        TcpServer srv_3;
         //串口初始化
         serial.Serial_init();
 
@@ -127,23 +126,28 @@ int main(int argc, char *argv[]) {
 
         //系统服务
         UART_TcpServer_Instance(svr_sys, SYS_PORT,
-                                std::bind(&SerialMessageCallback::svr_sys_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr_sys_onMessageCallback, &serialMessageCallback,
+                                          std::placeholders::_1));
 
         //串口0透传服务
         UART_TcpServer_Instance(srv_0, UART0_PORT,
-                                std::bind(&SerialMessageCallback::svr0_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr0_onMessageCallback, &serialMessageCallback,
+                                          std::placeholders::_1));
 
         //串口1透传服务
         UART_TcpServer_Instance(srv_1, UART1_PORT,
-                                std::bind(&SerialMessageCallback::svr1_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr1_onMessageCallback, &serialMessageCallback,
+                                          std::placeholders::_1));
 
         //串口2透传服务
         UART_TcpServer_Instance(srv_2, UART2_PORT,
-                                std::bind(&SerialMessageCallback::svr2_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr2_onMessageCallback, &serialMessageCallback,
+                                          std::placeholders::_1));
 
         //串口3透传服务
         UART_TcpServer_Instance(srv_3, UART3_PORT,
-                                std::bind(&SerialMessageCallback::svr3_onMessageCallback, &serialMessageCallback, std::placeholders::_1));
+                                std::bind(&SerialMessageCallback::svr3_onMessageCallback, &serialMessageCallback,
+                                          std::placeholders::_1));
 
         if (ToolKits::isFileExists(DEMO_LOCK)) {
             serialMessageCallback.svr_demoThread();
@@ -153,6 +157,12 @@ int main(int argc, char *argv[]) {
         SerialReceiveHandle serialReceiveHandle(serial, srv_0, srv_1, srv_2, srv_3);
         //串口消息处理线程
         serialReceiveHandle.Serial_receiveHandle();
+
+        //触屏事件处理
+        InputEvent inputEvent;
+        inputEvent.init(INPUT_EVENT_TOUCH_PATH);
+        inputEvent.setSrv(&svr_sys);
+        inputEvent.handle();
 
         while (true) {
             if (!ToolKits::isDeviceExist(UART0_PATH)) {
@@ -169,7 +179,6 @@ int main(int argc, char *argv[]) {
         }
 
 
-
     } else {
         //娱乐屏客户端应用
         std::string ip = ToolKits::getGateway();
@@ -183,10 +192,11 @@ int main(int argc, char *argv[]) {
         //实例化客户端消息处理
         SystemMessageCallback systemMessageCallback;
         TCP_Client_Instance(cli, SYS_PORT, ip.c_str(),
-                            std::bind(&SystemMessageCallback::onMessageCallback, &systemMessageCallback, std::placeholders::_1));
+                            std::bind(&SystemMessageCallback::onMessageCallback, &systemMessageCallback,
+                                      std::placeholders::_1));
 
 
-        while (true){
+        while (true) {
             sleep(300);
         }
 

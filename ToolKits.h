@@ -21,6 +21,10 @@
 #define BOARD_SERIAL " /data/local/addition/tmp/serial"
 //主板网关
 #define BOARD_GATEWAY " /data/local/addition/tmp/gateway"
+//触屏事件节点
+#define INPUT_EVENT_TOUCH_PATH " /dev/input/event5"
+//屏幕常亮标识
+#define SCREEN_ON_LOCK " /data/local/addition/tmp/screen_on.lock"
 
 class ToolKits {
 public:
@@ -39,15 +43,15 @@ public:
 
     static void dump(const uint8_t *data, size_t len);
 
-    static bool isFileExists(const std::string& filename);
+    static bool isFileExists(const std::string &filename);
 
-    static bool isDeviceExist(const std::string& devicePath);
+    static bool isDeviceExist(const std::string &devicePath);
 
-    static void disablePackage(const std::string& package);
+    static void disablePackage(const std::string &package);
 
-    static void enablePackage(const std::string& package);
+    static void enablePackage(const std::string &package);
 
-    static std::string getGateway() ;
+    static std::string getGateway();
 };
 
 

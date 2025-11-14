@@ -62,9 +62,6 @@ void SystemMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
             std::system("svc power reboot loader");
             break;
         }
-        case E_SYS_MSG_ID_SYNC: {
-            break;
-        }
         case E_SYS_MSG_ID_POWER: {
             std::system("input keyevent POWER");
             break;

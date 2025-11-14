@@ -20,7 +20,7 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(arm64-android/include)
 link_directories(arm64-android/lib)
 
-add_executable(${PROJECT_NAME} main.cpp ToolKits.cpp Serial.cpp SerialMessageCallback.cpp SerialReceiveHandle.cpp SystemMessageCallback.cpp)
+add_executable(${PROJECT_NAME} main.cpp ToolKits.cpp Serial.cpp SerialMessageCallback.cpp SerialReceiveHandle.cpp SystemMessageCallback.cpp InputEvent.cpp)
 target_link_libraries(${PROJECT_NAME} -lhv_static -llog -static-libstdc++)
 
 add_executable(TcpClient_test TcpClient_test.cpp)

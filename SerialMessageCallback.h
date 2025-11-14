@@ -148,8 +148,7 @@ enum E_SYS_MSG_ID {
     E_SYS_MSG_ID_SHUTDOWN = 1,//关机
     E_SYS_MSG_ID_REBOOT = 2,//重启
     E_SYS_MSG_ID_REBOOT_BOOTLOADER = 3,//进入刷机模式
-    E_SYS_MSG_ID_SYNC = 4,//保存数据
-    E_SYS_MSG_ID_POWER = 5,//模拟电源按键
+    E_SYS_MSG_ID_POWER = 4,//模拟电源按键
 };
 
 //系统扩展消息枚举
