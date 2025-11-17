@@ -9,6 +9,8 @@
 #include <fstream>
 #include <string>
 
+std::time_t last_screen_last_timestamp = 0; //上一次屏幕操作时间
+
 void ToolKits::GPIOInit(uint8_t GPIO) {
     char command[255];
     sprintf(command, "echo %d > /sys/class/gpio/export", GPIO);
@@ -183,9 +185,15 @@ void ToolKits::systemKeyCodeWakeup() {
 }
 
 void ToolKits::systemScreenOff() {
+    std::time_t t = std::time(nullptr);
+    if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
+    last_screen_last_timestamp = t;
     std::system("echo off > /sys/class/drm/card0-HDMI-A-1/status");
 }
 
 void ToolKits::systemScreenOn() {
+    std::time_t t = std::time(nullptr);
+    if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
+    last_screen_last_timestamp = t;
     std::system("echo on > /sys/class/drm/card0-HDMI-A-1/status");
 }

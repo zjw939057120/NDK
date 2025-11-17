@@ -96,5 +96,4 @@ public:
     static void systemScreenOn();
 };
 
-
 #endif //TCPSERVER_TOOLKITS_H

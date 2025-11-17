@@ -112,7 +112,7 @@ void SerialMessageCallback::svr2_onMessageCallback(Buffer *buf) {
         buffer[5] == relay_buf_on_0[5] &&
         buffer[6] == relay_buf_on_0[6] &&
         buffer[7] == relay_buf_on_0[7]) {
-        //打开0号继电器
+        //打开继电器0号
         ToolKits::createFile(RELAY_ON_0_LOCK);
         // 打开屏幕
         ToolKits::systemScreenOn();
@@ -124,7 +124,7 @@ void SerialMessageCallback::svr2_onMessageCallback(Buffer *buf) {
                buffer[5] == relay_buf_off_0[5] &&
                buffer[6] == relay_buf_off_0[6] &&
                buffer[7] == relay_buf_off_0[7]) {
-        //关闭0号继电器
+        //关闭继电器0号
         ToolKits::deleteFile(RELAY_ON_0_LOCK);
         // 关闭屏幕
         ToolKits::systemScreenOff();
