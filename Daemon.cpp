@@ -64,7 +64,7 @@ void Daemon::screenCheckThread() {
 
     std::thread t([this]() {
         while (true) {
-            sleep(5 * 60);//5分钟检测屏幕状态
+            sleep(20 * 60);//20分钟检测屏幕状态
             if (ToolKits::isFileExists(RELAY_ON_0_LOCK)) {
                 m_srv_sys->broadcast(buf_screen_on, CAN_BUFFER_LEN);
                 ToolKits::systemScreenOn();

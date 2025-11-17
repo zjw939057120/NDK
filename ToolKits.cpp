@@ -185,7 +185,7 @@ void ToolKits::systemKeyCodeWakeup() {
 }
 
 void ToolKits::systemScreenOff(bool force) {
-    if (force) {
+    if (!force) {
         std::time_t t = std::time(nullptr);
         if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
         last_screen_last_timestamp = t;
@@ -195,7 +195,7 @@ void ToolKits::systemScreenOff(bool force) {
 }
 
 void ToolKits::systemScreenOn(bool force) {
-    if (force) {
+    if (!force) {
         std::time_t t = std::time(nullptr);
         if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
         last_screen_last_timestamp = t;

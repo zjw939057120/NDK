@@ -13,8 +13,8 @@ using namespace hv;
 class SerialReceiveHandle {
 
 public:
-    SerialReceiveHandle(Serial &serial,
-                        TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv, TcpServer &UART3_srv);
+    SerialReceiveHandle(Serial *serial,
+                        TcpServer *UART0_srv, TcpServer *UART1_srv, TcpServer *UART2_srv, TcpServer *UART3_srv);
 
     void Serial_receiveHandle();
 
@@ -36,11 +36,11 @@ private:
     void Serial7_receiveHandle();
 
 private:
-    Serial &m_serial;
-    TcpServer &m_srv_0;
-    TcpServer &m_srv_1;
-    TcpServer &m_srv_2;
-    TcpServer &m_srv_3;
+    Serial *m_serial;
+    TcpServer *m_srv_0;
+    TcpServer *m_srv_1;
+    TcpServer *m_srv_2;
+    TcpServer *m_srv_3;
 
 };
 

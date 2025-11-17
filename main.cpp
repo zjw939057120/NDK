@@ -122,7 +122,7 @@ int main(int argc, char *argv[]) {
         serial.Serial_init();
 
         //实例化服务端消息处理
-        SerialMessageCallback serialMessageCallback(serial, svr_sys, srv_0, srv_1, srv_2, srv_3);
+        SerialMessageCallback serialMessageCallback(&serial, &svr_sys, &srv_0, &srv_1, &srv_2, &srv_3);
 
         //系统服务
         UART_TcpServer_Instance(svr_sys, SYS_PORT,
@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
         }
 
         //实例化串口消息处理
-        SerialReceiveHandle serialReceiveHandle(serial, srv_0, srv_1, srv_2, srv_3);
+        SerialReceiveHandle serialReceiveHandle(&serial, &srv_0, &srv_1, &srv_2, &srv_3);
         //串口消息处理线程
         serialReceiveHandle.Serial_receiveHandle();
 

@@ -41,13 +41,6 @@ private:
     uint8_t input_event_touch_count = 0;//连续触屏计数
     long last_input_event_tv_sec = 0;//上一次触屏时间
     E_INPUT_EVENT_TOUCH last_input_event_touch_value = E_INPUT_EVENT_TOUCH_UP;//上一次触屏值
-
-    //关闭娱乐屏幕E_SYS_MSG_ID_SCREEN_OFF
-    const uint8_t buf_screen_off[CAN_BUFFER_LEN] = {0x00, 0x00, 0x00, 0x00, 0x0C, 0x00, 0x00, 0x00, 0x00,
-                                                    0x00, 0x00, 0x00, 0x00};
-    //打开娱乐屏幕E_SYS_MSG_ID_SCREEN_ON
-    const uint8_t buf_screen_on[CAN_BUFFER_LEN] = {0x00, 0x00, 0x00, 0x00, 0x0D, 0x00, 0x00, 0x00, 0x00,
-                                                   0x00, 0x00, 0x00, 0x00};
 };
 
 
