@@ -6,9 +6,13 @@
 #include "Daemon.h"
 #include "ToolKits.h"
 
-void Daemon::init(const char *device) {
-    fd = open(device, O_RDONLY);
+void Daemon::init() {
 }
+
+void Daemon::openTouchDev() {
+    fd = open(INPUT_EVENT_TOUCH_PATH, O_RDONLY);//打开触屏设备
+}
+
 
 void Daemon::touchEventThread() {
     if (!fd) return;

@@ -77,7 +77,7 @@ int TCP_Client_Instance(TcpClient &cli, int remote_port, const char *remote_host
     return 0;
 }
 
-void init() {
+void onceInit() {
     if (ToolKits::isFileExists(TCP_SERVER_LOCK))
         return;
 
@@ -109,7 +109,7 @@ int main(int argc, char *argv[]) {
     ToolKits::getSerialNumber();
 
     //环境初始化
-    init();
+    onceInit();
     //中控屏服务端应用
     if (ToolKits::isDeviceExist(EC20_PATH)) {
         Serial serial;
@@ -160,8 +160,9 @@ int main(int argc, char *argv[]) {
 
         //后台服务
         Daemon daemon;
-        daemon.init(INPUT_EVENT_TOUCH_PATH);
+        daemon.init();
         daemon.setSrv(&svr_sys);
+        daemon.openTouchDev();
         //触屏事件线程
         daemon.touchEventThread();
         //屏幕检测线程

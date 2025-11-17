@@ -23,6 +23,6 @@ int UART_TcpServer_Instance(TcpServer &srv, int port, const std::function<void(B
 
 int TCP_Client_Instance(TcpClient &cli, int remote_port, const char *remote_host, const std::function<void(Buffer *)> &onMessage);
 
-void init();
+void onceInit();
 
 #endif //TCPSERVER_MAIN_H

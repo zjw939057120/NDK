@@ -27,7 +27,9 @@ enum E_INPUT_EVENT_TOUCH {
 class Daemon {
 
 public:
-    void init(const char *device);
+    void init();
+
+    void openTouchDev();
 
     void setSrv(TcpServer *SYS_srv);
 
