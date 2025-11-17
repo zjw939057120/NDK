@@ -47,96 +47,96 @@ void SystemMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
 
     switch ((E_SYS_MSG_ID) msgId) {
         case E_SYS_MSG_ID_SETTINGS: {
-            std::system("am start -a android.settings.SETTINGS");
+            ToolKits::systemOpenSettings();
             break;
         }
         case E_SYS_MSG_ID_SHUTDOWN: {
             std::thread t([]() {
-                std::system("svc power shutdown");
+                ToolKits::systemPowerShutown();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_REBOOT: {
             std::thread t([]() {
-                std::system("svc power reboot");
+                ToolKits::systemPowerReboot();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
             std::thread t([]() {
-                std::system("svc power reboot loader");
+                ToolKits::systemPowerRebootLoader();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_HOME: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_HOME");
+                ToolKits::systemKeyCodeHome();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_MENU: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_MENU");
+                ToolKits::systemKeyCodeMenu();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_VOLUME_DOWN: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_VOLUME_DOWN");
+                ToolKits::systemKeyCodeVolueDown();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_VOLUME_UP: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_VOLUME_UP");
+                ToolKits::systemKeyCodeVolueUp();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_VOLUME_MUTE: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_VOLUME_MUTE");
+                ToolKits::systemKeyCodeVolueMute();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_POWER: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_POWER");
+                ToolKits::systemKeyCodePower();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_SLEEP: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_SLEEP");
+                ToolKits::systemKeyCodeSleep();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_KEYCODE_WAKEUP: {
             std::thread t([]() {
-                std::system("input keyevent KEYCODE_WAKEUP");
+                ToolKits::systemKeyCodeWakeup();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_SCREEN_OFF: {
             std::thread t([]() {
-                std::system("echo off > /sys/class/drm/card0-HDMI-A-1/status");
+                ToolKits::systemScreenOff();
             });
             t.detach();
             break;
         }
         case E_SYS_MSG_ID_SCREEN_ON: {
             std::thread t([]() {
-                std::system("echo on > /sys/class/drm/card0-HDMI-A-1/status");
+                ToolKits::systemScreenOn();
             });
             t.detach();
             break;

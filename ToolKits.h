@@ -10,21 +10,31 @@
 #include <string>
 #include <unistd.h>
 
-#define SWITCH_1 32 //GPIO0_A0
-#define SWITCH_2 33 //GPIO0_A1
-#define SWITCH_3 36 //GPIO0_A4
-#define SWITCH_4 40 //GPIO1_B0
-#define SWITCH_5 41 //GPIO1_B1
-#define SWITCH_6 42 //GPIO1_B2
-
 //主板序列号
 #define BOARD_SERIAL " /data/local/addition/tmp/serial"
 //主板网关
 #define BOARD_GATEWAY " /data/local/addition/tmp/gateway"
 //触屏事件节点
 #define INPUT_EVENT_TOUCH_PATH " /dev/input/event5"
-//屏幕常亮标识
-#define SCREEN_ON_LOCK " /data/local/addition/tmp/screen_on.lock"
+//继电器0号打开标识
+#define RELAY_ON_0_LOCK "/data/local/addition/tmp/relay_on_0.lock"
+//继电器1号打开标识
+#define RELAY_ON_1_LOCK "/data/local/addition/tmp/relay_on_1.lock"
+//继电器2号打开标识
+#define RELAY_ON_2_LOCK " /data/local/addition/tmp/relay_on_2.lock"
+//继电器3号打开标识
+#define RELAY_ON_3_LOCK " /data/local/addition/tmp/relay_on_3.lock"
+//继电器3号打开标识
+//初始化完成标识
+#define TCP_SERVER_LOCK "/data/local/addition/TcpServer.lock"
+//日志文件路径
+#define TCP_SERVER_LOG "/data/local/addition/TcpServer.log"
+//DEMO模式标识
+#define DEMO_LOCK "/data/local/addition/demo.lock"
+//中控屏app包名
+#define PACKAGE_COM_HBTENGLV_BOAT "com.hbtenglv.boat"
+//娱乐屏app包名
+#define PACKAGE_COM_HBTENGLV_BOAT_HOME "com.hbtenglv.boathome"
 
 class ToolKits {
 public:
@@ -52,6 +62,38 @@ public:
     static void enablePackage(const std::string &package);
 
     static std::string getGateway();
+
+    static void createFile(const char file[]);
+
+    static void deleteFile(const char *file);
+
+    static void systemOpenSettings();
+
+    static void systemPowerShutown();
+
+    static void systemPowerReboot();
+
+    static void systemPowerRebootLoader();
+
+    static void systemKeyCodeHome();
+
+    static void systemKeyCodeMenu();
+
+    static void systemKeyCodeVolueDown();
+
+    static void systemKeyCodeVolueUp();
+
+    static void systemKeyCodeVolueMute();
+
+    static void systemKeyCodePower();
+
+    static void systemKeyCodeSleep();
+
+    static void systemKeyCodeWakeup();
+
+    static void systemScreenOff();
+
+    static void systemScreenOn();
 };
 
 

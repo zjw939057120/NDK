@@ -5,6 +5,9 @@
 #include <cstdlib>
 #include "ToolKits.h"
 #include <sys/stat.h>  // for stat()
+#include <iostream>
+#include <fstream>
+#include <string>
 
 void ToolKits::GPIOInit(uint8_t GPIO) {
     char command[255];
@@ -119,3 +122,70 @@ std::string ToolKits::getGateway() {
     return ret;
 }
 
+void ToolKits::createFile(const char file[]) {
+    // 打开文件（如果不存在则创建）
+    std::ofstream outFile(file);
+    // 关闭文件
+    outFile.close();
+}
+
+void ToolKits::deleteFile(const char *file) {
+    unlink(file);
+}
+
+void ToolKits::systemOpenSettings() {
+    std::system("am start -a android.settings.SETTINGS");
+}
+
+void ToolKits::systemPowerShutown() {
+    std::system("svc power shutdown");
+}
+
+void ToolKits::systemPowerReboot() {
+    std::system("svc power reboot");
+}
+
+void ToolKits::systemPowerRebootLoader() {
+    std::system("svc power reboot loader");
+}
+
+void ToolKits::systemKeyCodeHome() {
+    std::system("input keyevent KEYCODE_HOME");
+}
+
+void ToolKits::systemKeyCodeMenu() {
+    std::system("input keyevent KEYCODE_MENU");
+}
+
+void ToolKits::systemKeyCodeVolueDown() {
+    std::system("input keyevent KEYCODE_VOLUME_DOWN");
+}
+
+void ToolKits::systemKeyCodeVolueUp() {
+    std::system("input keyevent KEYCODE_VOLUME_UP");
+}
+
+void ToolKits::systemKeyCodeVolueMute() {
+    std::system("input keyevent KEYCODE_VOLUME_MUTE");
+}
+
+void ToolKits::systemKeyCodePower() {
+    std::system("input keyevent KEYCODE_POWER");
+
+}
+
+void ToolKits::systemKeyCodeSleep() {
+    std::system("input keyevent KEYCODE_SLEEP");
+}
+
+void ToolKits::systemKeyCodeWakeup() {
+    std::system("input keyevent KEYCODE_WAKEUP");
+}
+
+void ToolKits::systemScreenOff() {
+    std::system("echo off > /sys/class/drm/card0-HDMI-A-1/status");
+}
+
+void ToolKits::systemScreenOn() {
+    std::system("echo on > /sys/class/drm/card0-HDMI-A-1/status");
+}

@@ -52,7 +52,7 @@ void InputEvent::handle() {
 }
 
 void InputEvent::touchEventHandle() {
-    if (!ToolKits::isFileExists(SCREEN_ON_LOCK)) {
+    if (!ToolKits::isFileExists(RELAY_ON_0_LOCK)) {
         m_srv_sys->broadcast(buf_input_keyevent_power, CAN_BUFFER_LEN);
         std::thread t([]() {
             sleep(1);

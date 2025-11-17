@@ -8,12 +8,6 @@
 #include "hv/TcpServer.h"
 #include "Serial.h"
 
-#define TCP_SERVER_LOCK "/data/local/addition/TcpServer.lock"
-#define TCP_SERVER_LOG "/data/local/addition/TcpServer.log"
-#define DEMO_LOCK "/data/local/addition/demo.lock"
-#define PACKAGE_COM_HBTENGLV_BOAT "com.hbtenglv.boat"
-#define PACKAGE_COM_HBTENGLV_BOAT_HOME "com.hbtenglv.boathome"
-
 //CAN模块缓冲区长度
 #define CAN_BUFFER_LEN 13
 #define CAN_MSG_ID_LEN 4
@@ -132,6 +126,11 @@ private:
     //下发继电器状态
     const uint8_t relay_buf_0x0103[21] = {0x01, 0x03, 0x10, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x01, 0x00, 0x00,
                                           0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x2E, 0xB4};
+    //打开0号继电器
+    const uint8_t relay_buf_on_0[RELAY_BUFFER_LEN] = {0x01, 0x06, 0x00, 0x00, 0x00, 0x01, 0x48, 0x0A};
+
+    //关闭0号继电器
+    const uint8_t relay_buf_off_0[RELAY_BUFFER_LEN] = {0x01, 0x06, 0x00, 0x00, 0x00, 0x00, 0x89, 0xCA};
 
     //惯导模块消息(11字节加速度+11字节角速度+11字节角度+11字节磁场)
     const uint8_t imu_buf_0x05[IMU_BUFFER_LEN] = {0x55, 0x51, 0x4b, 0x00, 0x0a, 0x00, 0xff, 0x07, 0x8b, 0x0b, 0x9a,
@@ -156,8 +155,8 @@ enum E_SYS_MSG_ID {
     E_SYS_MSG_ID_KEYCODE_POWER = 9,//电源按键
     E_SYS_MSG_ID_KEYCODE_SLEEP = 10,//休眠按键
     E_SYS_MSG_ID_KEYCODE_WAKEUP = 11,//唤醒按键
-    E_SYS_MSG_ID_SCREEN_OFF = 12,//唤醒按键
-    E_SYS_MSG_ID_SCREEN_ON = 13,//唤醒按键
+    E_SYS_MSG_ID_SCREEN_OFF = 12,//关闭屏幕
+    E_SYS_MSG_ID_SCREEN_ON = 13,//打开屏幕
 };
 
 //系统扩展消息枚举

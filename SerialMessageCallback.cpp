@@ -7,8 +7,9 @@
 #include "ToolKits.h"
 
 SerialMessageCallback::SerialMessageCallback(Serial &serial,
-                           TcpServer &SYS_srv, TcpServer &UART0_srv, TcpServer &UART1_srv, TcpServer &UART2_srv,
-                           TcpServer &UART3_srv)
+                                             TcpServer &SYS_srv, TcpServer &UART0_srv, TcpServer &UART1_srv,
+                                             TcpServer &UART2_srv,
+                                             TcpServer &UART3_srv)
         : m_serial(serial),
           m_srv_sys(SYS_srv), m_srv_0(UART0_srv), m_srv_1(UART1_srv), m_srv_2(UART2_srv), m_srv_3(UART3_srv) {
 
@@ -46,13 +47,11 @@ void SerialMessageCallback::svr_sys_onMessageCallback(Buffer *buf) {
             Sys_MsgType_0x01(buffer, msgId, msgBody);
             break;
         }
-        case 0x02:
-        {
+        case 0x02: {
             Sys_MsgType_0x02(buffer, msgId, msgBody);
             break;
         }
-        case 0x03:
-        {
+        case 0x03: {
             Sys_MsgType_0x03(buffer, msgId, msgBody);
             break;
         }
@@ -87,10 +86,6 @@ void SerialMessageCallback::svr0_onMessageCallback(Buffer *buf) {
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //CAN消息,校验数据长度
     ToolKits::dump(buffer, size);
-//    if (size < CAN_BUFFER_LEN) {
-//        m_srv_0.broadcast(can_buf_empty, CAN_BUFFER_LEN);
-//        return;
-//    }
     m_serial.Serial0_send(buffer, CAN_BUFFER_LEN); // 转发tcp客户端数据到串口
 }
 
@@ -99,10 +94,6 @@ void SerialMessageCallback::svr1_onMessageCallback(Buffer *buf) {
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //控制器消息,校验数据长度
     ToolKits::dump(buffer, size);
-//    if (size < CAN_BUFFER_LEN) {
-//        m_srv_1.broadcast(can_buf_empty, CAN_BUFFER_LEN);
-//        return;
-//    }
     m_serial.Serial1_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
@@ -111,10 +102,33 @@ void SerialMessageCallback::svr2_onMessageCallback(Buffer *buf) {
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //继电器消息,校验数据长度
     ToolKits::dump(buffer, size);
-//    if (size < CAN_BUFFER_LEN) {
-//        m_srv_2.broadcast(can_buf_empty, CAN_BUFFER_LEN);
-//        return;
-//    }
+    if (size != RELAY_BUFFER_LEN) return;
+
+    if (buffer[0] == relay_buf_on_0[0] &&
+        buffer[1] == relay_buf_on_0[1] &&
+        buffer[2] == relay_buf_on_0[2] &&
+        buffer[3] == relay_buf_on_0[3] &&
+        buffer[4] == relay_buf_on_0[4] &&
+        buffer[5] == relay_buf_on_0[5] &&
+        buffer[6] == relay_buf_on_0[6] &&
+        buffer[7] == relay_buf_on_0[7]) {
+        //打开0号继电器
+        ToolKits::createFile(RELAY_ON_0_LOCK);
+        // 打开屏幕
+        ToolKits::systemScreenOn();
+    } else if (buffer[0] == relay_buf_off_0[0] &&
+               buffer[1] == relay_buf_off_0[1] &&
+               buffer[2] == relay_buf_off_0[2] &&
+               buffer[3] == relay_buf_off_0[3] &&
+               buffer[4] == relay_buf_off_0[4] &&
+               buffer[5] == relay_buf_off_0[5] &&
+               buffer[6] == relay_buf_off_0[6] &&
+               buffer[7] == relay_buf_off_0[7]) {
+        //关闭0号继电器
+        ToolKits::deleteFile(RELAY_ON_0_LOCK);
+        // 关闭屏幕
+        ToolKits::systemScreenOff();
+    }
     m_serial.Serial2_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
@@ -123,10 +137,6 @@ void SerialMessageCallback::svr3_onMessageCallback(Buffer *buf) {
     auto *buffer = static_cast<uint8_t *>(buf->data());
     //惯导消息,校验数据长度
     ToolKits::dump(buffer, size);
-//    if (size < CAN_BUFFER_LEN) {
-//        m_srv_3.broadcast(can_buf_empty, CAN_BUFFER_LEN);
-//        return;
-//    }
     m_serial.Serial3_send(buffer, size); // 转发tcp客户端数据到串口
 }
 
@@ -138,13 +148,13 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
     switch ((E_SYS_MSG_ID) msgId) {
         case E_SYS_MSG_ID_SETTINGS: {
             std::this_thread::sleep_for(std::chrono::milliseconds(200));
-            std::system("am start -a android.settings.SETTINGS");
+            ToolKits::systemOpenSettings();
             break;
         }
         case E_SYS_MSG_ID_SHUTDOWN: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("svc power shutdown");
+                ToolKits::systemPowerShutown();
             });
             t.detach();
             break;
@@ -152,7 +162,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_REBOOT: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("svc power reboot");
+                ToolKits::systemPowerReboot();
             });
             t.detach();
             break;
@@ -160,7 +170,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_REBOOT_BOOTLOADER: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("svc power reboot loader");
+                ToolKits::systemPowerRebootLoader();
             });
             t.detach();
             break;
@@ -168,7 +178,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_HOME: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_HOME");
+                ToolKits::systemKeyCodeHome();
             });
             t.detach();
             break;
@@ -176,7 +186,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_MENU: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_MENU");
+                ToolKits::systemKeyCodeMenu();
             });
             t.detach();
             break;
@@ -184,7 +194,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_VOLUME_DOWN: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_VOLUME_DOWN");
+                ToolKits::systemKeyCodeVolueDown();
             });
             t.detach();
             break;
@@ -192,7 +202,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_VOLUME_UP: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_VOLUME_UP");
+                ToolKits::systemKeyCodeVolueUp();
             });
             t.detach();
             break;
@@ -200,7 +210,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_VOLUME_MUTE: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_VOLUME_MUTE");
+                ToolKits::systemKeyCodeVolueMute();
             });
             t.detach();
             break;
@@ -208,7 +218,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_POWER: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_POWER");
+                ToolKits::systemKeyCodePower();
             });
             t.detach();
             break;
@@ -216,7 +226,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_SLEEP: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_SLEEP");
+                ToolKits::systemKeyCodeSleep();
             });
             t.detach();
             break;
@@ -224,7 +234,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_KEYCODE_WAKEUP: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("input keyevent KEYCODE_WAKEUP");
+                ToolKits::systemKeyCodeWakeup();
             });
             t.detach();
             break;
@@ -232,7 +242,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_SCREEN_OFF: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("echo off > /sys/class/drm/card0-HDMI-A-1/status");
+                ToolKits::systemScreenOff();
             });
             t.detach();
             break;
@@ -240,7 +250,7 @@ void SerialMessageCallback::Sys_MsgType_0x00(uint8_t *buffer, uint32_t msgId, co
         case E_SYS_MSG_ID_SCREEN_ON: {
             std::thread t([]() {
                 std::this_thread::sleep_for(std::chrono::milliseconds(200));
-                std::system("echo on > /sys/class/drm/card0-HDMI-A-1/status");
+                ToolKits::systemScreenOn();
             });
             t.detach();
             break;
@@ -307,6 +317,7 @@ void SerialMessageCallback::Sys_MsgType_0x12(uint8_t *buffer, uint32_t msgId, co
 void SerialMessageCallback::Sys_MsgType_0x13(uint8_t *buffer, uint32_t msgId, const uint8_t *msgBody) {
     m_srv_sys.broadcast(buffer, CAN_BUFFER_LEN);
 }
+
 void SerialMessageCallback::svr_demoThread() {
     //推进器、电池demo线程
     std::thread t0([this]() {
