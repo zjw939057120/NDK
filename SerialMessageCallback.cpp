@@ -112,12 +112,8 @@ void SerialMessageCallback::svr2_onMessageCallback(Buffer *buf) {
         buffer[5] == relay_buf_on_0[5] &&
         buffer[6] == relay_buf_on_0[6] &&
         buffer[7] == relay_buf_on_0[7]) {
-        //打开继电器0号
+        //打开继电器0号标识
         ToolKits::createFile(RELAY_ON_0_LOCK);
-        // 打开娱乐
-        m_srv_sys->broadcast(buf_screen_on, CAN_BUFFER_LEN);
-        // 打开中控屏
-        ToolKits::systemScreenOn();
     } else if (buffer[0] == relay_buf_off_0[0] &&
                buffer[1] == relay_buf_off_0[1] &&
                buffer[2] == relay_buf_off_0[2] &&
@@ -126,12 +122,8 @@ void SerialMessageCallback::svr2_onMessageCallback(Buffer *buf) {
                buffer[5] == relay_buf_off_0[5] &&
                buffer[6] == relay_buf_off_0[6] &&
                buffer[7] == relay_buf_off_0[7]) {
-        //关闭继电器0号
+        //关闭继电器0号标识
         ToolKits::deleteFile(RELAY_ON_0_LOCK);
-        // 关闭娱乐屏
-        m_srv_sys->broadcast(buf_screen_off, CAN_BUFFER_LEN);
-        // 关闭中控屏
-        ToolKits::systemScreenOff();
     }
     m_serial->Serial2_send(buffer, size); // 转发tcp客户端数据到串口
 }
