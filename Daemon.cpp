@@ -3,14 +3,14 @@
 //
 
 #include <thread>
-#include "InputEvent.h"
+#include "Daemon.h"
 #include "ToolKits.h"
 
-void InputEvent::init(const char *device) {
+void Daemon::init(const char *device) {
     fd = open(device, O_RDONLY);
 }
 
-void InputEvent::handle() {
+void Daemon::touchEventThread() {
     if (!fd) return;
 
     std::thread t([this]() {
@@ -36,10 +36,15 @@ void InputEvent::handle() {
                 continue;//过滤非连续点击事件
             } else if (last_input_event_touch_value == E_INPUT_EVENT_TOUCH_DOWN && value == E_INPUT_EVENT_TOUCH_UP) {
                 input_event_touch_count++;//连续触屏计数
+//                printf("input_event_touch_count++ %d\r\n", input_event_touch_count);
                 if (input_event_touch_count == 5) {
-                    printf("input_event_touch_count++ %d\r\n", input_event_touch_count);
-                    touchEventHandle();//连续点击5次触发电源按键时间
+                    printf("input_event_touch_count = %d\r\n", input_event_touch_count);
                     input_event_touch_count = 0;
+                    if (!ToolKits::isFileExists(SCREEN_ON_LOCK)) {
+                        //强制打开屏幕
+                        m_srv_sys->broadcast(buf_screen_on, CAN_BUFFER_LEN);
+                        ToolKits::systemScreenOn(true);
+                    }
                 }
             }
 
@@ -47,22 +52,28 @@ void InputEvent::handle() {
             last_input_event_touch_value = value;
         }
     });
-
     t.detach();
 }
 
-void InputEvent::touchEventHandle() {
-    if (!ToolKits::isFileExists(RELAY_ON_0_LOCK)) {
-        m_srv_sys->broadcast(buf_input_keyevent_power, CAN_BUFFER_LEN);
-        std::thread t([]() {
-            sleep(1);
-            //模拟电源按键
-            std::system("input keyevent POWER");
-        });
-        t.detach();
-    }
-}
-
-void InputEvent::setSrv(TcpServer *SYS_srv) {
+void Daemon::setSrv(TcpServer *SYS_srv) {
     m_srv_sys = SYS_srv;
 }
+
+void Daemon::screenCheckThread() {
+    if (!fd) return;
+
+    std::thread t([this]() {
+        while (true) {
+            sleep(5 * 60);//5分钟检测屏幕状态
+            if (ToolKits::isFileExists(RELAY_ON_0_LOCK)) {
+                m_srv_sys->broadcast(buf_screen_on, CAN_BUFFER_LEN);
+                ToolKits::systemScreenOn();
+            } else {
+                m_srv_sys->broadcast(buf_screen_off, CAN_BUFFER_LEN);
+                ToolKits::systemScreenOff();
+            }
+        }
+    });
+    t.detach();
+}
+

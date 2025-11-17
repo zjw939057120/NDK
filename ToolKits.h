@@ -11,20 +11,21 @@
 #include <unistd.h>
 
 //主板序列号
-#define BOARD_SERIAL " /data/local/addition/tmp/serial"
+#define BOARD_SERIAL "/data/local/addition/tmp/serial"
 //主板网关
-#define BOARD_GATEWAY " /data/local/addition/tmp/gateway"
+#define BOARD_GATEWAY "/data/local/addition/tmp/gateway"
 //触屏事件节点
-#define INPUT_EVENT_TOUCH_PATH " /dev/input/event5"
+#define INPUT_EVENT_TOUCH_PATH "/dev/input/event5"
 //继电器0号打开标识
 #define RELAY_ON_0_LOCK "/data/local/addition/tmp/relay_on_0.lock"
 //继电器1号打开标识
 #define RELAY_ON_1_LOCK "/data/local/addition/tmp/relay_on_1.lock"
 //继电器2号打开标识
-#define RELAY_ON_2_LOCK " /data/local/addition/tmp/relay_on_2.lock"
+#define RELAY_ON_2_LOCK "/data/local/addition/tmp/relay_on_2.lock"
 //继电器3号打开标识
-#define RELAY_ON_3_LOCK " /data/local/addition/tmp/relay_on_3.lock"
-//继电器3号打开标识
+#define RELAY_ON_3_LOCK "/data/local/addition/tmp/relay_on_3.lock"
+//屏幕打开标识
+#define SCREEN_ON_LOCK "/data/local/addition/tmp/screen_on.lock"
 //初始化完成标识
 #define TCP_SERVER_LOCK "/data/local/addition/TcpServer.lock"
 //日志文件路径
@@ -91,9 +92,9 @@ public:
 
     static void systemKeyCodeWakeup();
 
-    static void systemScreenOff();
+    static void systemScreenOff(bool force = false);
 
-    static void systemScreenOn();
+    static void systemScreenOn(bool force = false);
 };
 
 #endif //TCPSERVER_TOOLKITS_H

@@ -1,5 +1,5 @@
 #include "main.h"
-#include "InputEvent.h"
+#include "Daemon.h"
 
 int UART_TcpServer_Instance(TcpServer &srv, int port, const std::function<void(Buffer *)> &onMessage) {
     int listenfd = srv.createsocket(port);
@@ -158,11 +158,14 @@ int main(int argc, char *argv[]) {
         //串口消息处理线程
         serialReceiveHandle.Serial_receiveHandle();
 
-        //触屏事件处理
-        InputEvent inputEvent;
-        inputEvent.init(INPUT_EVENT_TOUCH_PATH);
-        inputEvent.setSrv(&svr_sys);
-        inputEvent.handle();
+        //后台服务
+        Daemon daemon;
+        daemon.init(INPUT_EVENT_TOUCH_PATH);
+        daemon.setSrv(&svr_sys);
+        //触屏事件线程
+        daemon.touchEventThread();
+        //屏幕检测线程
+        daemon.screenCheckThread();
 
         while (true) {
             if (!ToolKits::isDeviceExist(UART0_PATH)) {

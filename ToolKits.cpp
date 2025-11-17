@@ -184,16 +184,22 @@ void ToolKits::systemKeyCodeWakeup() {
     std::system("input keyevent KEYCODE_WAKEUP");
 }
 
-void ToolKits::systemScreenOff() {
-    std::time_t t = std::time(nullptr);
-    if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
-    last_screen_last_timestamp = t;
+void ToolKits::systemScreenOff(bool force) {
+    if (force) {
+        std::time_t t = std::time(nullptr);
+        if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
+        last_screen_last_timestamp = t;
+    }
     std::system("echo off > /sys/class/drm/card0-HDMI-A-1/status");
+    deleteFile(SCREEN_ON_LOCK);
 }
 
-void ToolKits::systemScreenOn() {
-    std::time_t t = std::time(nullptr);
-    if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
-    last_screen_last_timestamp = t;
+void ToolKits::systemScreenOn(bool force) {
+    if (force) {
+        std::time_t t = std::time(nullptr);
+        if (t < last_screen_last_timestamp + 60) return;//拦截频繁操作
+        last_screen_last_timestamp = t;
+    }
     std::system("echo on > /sys/class/drm/card0-HDMI-A-1/status");
+    createFile(SCREEN_ON_LOCK);
 }
