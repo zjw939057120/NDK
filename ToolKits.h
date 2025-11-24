@@ -92,9 +92,9 @@ public:
 
     static void systemKeyCodeWakeup();
 
-    static void systemScreenOff(bool force = false);
+    static void systemScreenOff(bool temp = false);
 
-    static void systemScreenOn(bool force = false);
+    static void systemScreenOn(bool temp = false);
 };
 
 #endif //TCPSERVER_TOOLKITS_H
